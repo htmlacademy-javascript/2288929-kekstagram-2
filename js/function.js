@@ -1,9 +1,6 @@
 // Функция для проверки длины строки
 
-const lengthValidation = (string, length) => {
-  const result = string.length <= length;
-  return result;
-};
+const lengthValidation = (string, length) => string.length <= length;
 
 lengthValidation('Капитан', 5);
 
