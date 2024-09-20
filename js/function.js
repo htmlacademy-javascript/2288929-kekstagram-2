@@ -1,50 +1,33 @@
-// Функция для проверки длины строки
+const isStrLengthValid = (str, maxLength) => str.length <= maxLength;
 
-const lengthValidation = (string, length) => string.length <= length;
+isStrLengthValid('Капитан', 5);
 
-lengthValidation('Капитан', 5);
+const isPalindrome = (str) => {
+  const editString = str.replaceAll(' ', '').toLowerCase();
 
-// Функция для проверки на палиндром
-
-const isPalindrom = (string) => {
-  const editString = string.replaceAll(' ', '').toLowerCase();
-  let reverseString = '';
-
-  for (let i = editString.length - 1; i >= 0; i--) {
-    reverseString += editString[i];
-  }
-
-  return reverseString === editString;
+  for (let i = 0; i <= length / 2; i++) {
+    if (editString.at(i) === editString.at(length - i - 1)) {
+      return true;
+    }
+  } return false;
 };
 
-isPalindrom('Аргентина манит негра');
+isPalindrome('Аргентина манит негра');
 
-// Функция для проверки на палиндром без цикла
-
-const isPalindromAlt = (string) => string.replaceAll(' ', '').toLowerCase() === string.replaceAll(' ', '').toLowerCase().split('').reverse().join('');
-
-isPalindromAlt('Около Миши молоко');
-
-// Функция изъятия чисел из строки
-
-const exportNumbres = (string) => {
+const extractNumbres = (str) => {
   let numberString = '';
 
-  if (typeof string === 'number') {
-    numberString = Math.abs(string);
+  if (typeof str === 'number') {
+    str = String(str);
   }
 
-  for (let i = 0; i <= string.length; i++) {
-    if (parseInt(string[i], 10) || parseInt(string[i], 10) === 0) {
-      numberString += string[i];
-      numberString = Number(numberString);
+  for (const char of str) {
+    if (!Number.isNaN(parseInt(char, 10))) {
+      numberString += char;
     }
   }
 
-  if (numberString.length === 0 || Number.isNaN(Number(numberString))) {
-    numberString = NaN;
-  }
-  return numberString;
+  return parseInt(numberString, 10);
 };
 
-exportNumbres('1 кефир, 0.5 батона');
+(extractNumbres(-1));
