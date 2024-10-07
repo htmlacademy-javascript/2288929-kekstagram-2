@@ -54,6 +54,8 @@ const MIN_COMMENT_NUMBERS = 0;
 
 const MAX_COMMENT_NUMBERS = 30;
 
+const PHOTO_COUNT = 25;
+
 const getRandomInteger = (a, b) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -80,4 +82,6 @@ const createPhoto = () => ({
   comments: createComments
 });
 
-createPhoto();
+const createPhotos = Array.from({length: PHOTO_COUNT}, createPhoto); // eslint-disable-line
+
+
