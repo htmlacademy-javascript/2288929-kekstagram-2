@@ -82,6 +82,7 @@ const createPhoto = () => ({
   comments: createComments
 });
 
-const createPhotos = Array.from({length: PHOTO_COUNT}, createPhoto); // eslint-disable-line
+const createPhotos = (count) => Array.from({length: count}, createPhoto);
 
 
+createPhotos(PHOTO_COUNT);
