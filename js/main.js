@@ -19,7 +19,7 @@ const NAMES = [
   'МИЛЕНА'
 ];
 
-const DESCRIPTION = [
+const DESCRIPTIONS = [
   'Голубая лагуна в нескольких киллометрах от МКАД',
   'Вот такой бимер мы купили для поездок',
   'Сходили на концерт, барабащик отжёг!',
@@ -30,36 +30,23 @@ const DESCRIPTION = [
   'Телефон выпал из рук и получилось это! Решила оставить, не судите строго!!1один'
 ];
 
-const MIN_PHOTO_ID = 1;
-
-const MAX_PHOTO_ID = 25;
-
 const MIN_PHOTO_URL_ID = 1;
-
 const MAX_PHOTO_URL_ID = 25;
-
 const MIN_LIKES = 15;
-
 const MAX_LIKES = 200;
-
 const MIN_COMMENT_ID = 1;
-
 const MAX_COMMENT_ID = 800;
-
 const MIN_COMMENT_AVATAR_ID = 1;
-
 const MAX_COMMENT_AVATAR_ID = 6;
-
 const MIN_COMMENT_NUMBERS = 0;
-
 const MAX_COMMENT_NUMBERS = 30;
-
 const PHOTO_COUNT = 25;
 
 const getRandomInteger = (a, b) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
   const result = Math.random() * (upper - lower + 1) + lower;
+
   return Math.floor(result);
 };
 
@@ -72,17 +59,16 @@ const createComment = () => ({
   name: getRandomArrayElement(NAMES)
 });
 
-const createComments = Array.from({length: getRandomInteger(MIN_COMMENT_NUMBERS, MAX_COMMENT_NUMBERS)}, createComment);
+const createComments = () => Array.from({length: getRandomInteger(MIN_COMMENT_NUMBERS, MAX_COMMENT_NUMBERS)}, createComment);
 
-const createPhoto = () => ({
-  id: getRandomInteger(MIN_PHOTO_ID, MAX_PHOTO_ID),
+const createPhoto = (id) => ({
+  id,
   url: `photos/${getRandomInteger(MIN_PHOTO_URL_ID, MAX_PHOTO_URL_ID)}.jpg`,
-  description: getRandomArrayElement(DESCRIPTION),
+  description: getRandomArrayElement(DESCRIPTIONS),
   likes: getRandomInteger(MIN_LIKES, MAX_LIKES),
-  comments: createComments
+  comments: createComments()
 });
 
-const createPhotos = (count) => Array.from({length: count}, createPhoto);
-
+const createPhotos = (length) => Array.from({length}, (_, index) => createPhoto(index + 1));
 
 createPhotos(PHOTO_COUNT);
