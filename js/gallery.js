@@ -36,22 +36,21 @@ const MIN_PHOTO_URL_ID = 1;
 const MAX_PHOTO_URL_ID = 25;
 const MIN_LIKES = 15;
 const MAX_LIKES = 200;
-const MIN_COMMENT_ID = 1;
-const MAX_COMMENT_ID = 800;
 const MIN_COMMENT_AVATAR_ID = 1;
 const MAX_COMMENT_AVATAR_ID = 6;
 const MIN_COMMENT_NUMBERS = 0;
 const MAX_COMMENT_NUMBERS = 30;
 const PHOTO_COUNT = 25;
 
-const createComment = () => ({
-  id: getRandomInteger(MIN_COMMENT_ID, MAX_COMMENT_ID),
+const createComment = (id) => ({
+  id: id,
   avatar: `img/avatar-${getRandomInteger(MIN_COMMENT_AVATAR_ID, MAX_COMMENT_AVATAR_ID)}.svg`,
   message: getRandomArrayElement(MESSAGES),
   name: getRandomArrayElement(NAMES)
 });
 
-const createComments = () => Array.from({length: getRandomInteger(MIN_COMMENT_NUMBERS, MAX_COMMENT_NUMBERS)}, createComment);
+const createComments = () => Array.from({length: getRandomInteger(MIN_COMMENT_NUMBERS, MAX_COMMENT_NUMBERS)},
+  (_, index) => createComment(index + 1));
 
 const createPhoto = (id) => ({
   id,
@@ -61,6 +60,7 @@ const createPhoto = (id) => ({
   comments: createComments()
 });
 
-export const createPhotos = (length) => Array.from({length}, (_, index) => createPhoto(index + 1));
+export const createPhotos = (length) => Array.from({length},
+  (_, index) => createPhoto(index + 1));
 
 createPhotos(PHOTO_COUNT);
