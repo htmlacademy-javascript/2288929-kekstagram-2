@@ -1,5 +1,8 @@
 import {getRandomInteger, getRandomArrayElement} from './utils.js';
 
+const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
+const picturesContainer = document.querySelector('.pictures');
+
 const MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -38,10 +41,10 @@ const MIN_COMMENT_AVATAR_ID = 1;
 const MAX_COMMENT_AVATAR_ID = 6;
 const MIN_COMMENT_NUMBERS = 0;
 const MAX_COMMENT_NUMBERS = 30;
-export const PHOTO_COUNT = 25;
+const PHOTO_COUNT = 25;
 
 const createComment = (id) => ({
-  id: id,
+  id,
   avatar: `img/avatar-${getRandomInteger(MIN_COMMENT_AVATAR_ID, MAX_COMMENT_AVATAR_ID)}.svg`,
   message: getRandomArrayElement(MESSAGES),
   name: getRandomArrayElement(NAMES)
@@ -61,4 +64,30 @@ const createPhoto = (id) => ({
 export const createPhotos = (length) => Array.from({length},
   (_, index) => createPhoto(index + 1));
 
-createPhotos(PHOTO_COUNT);
+const createThumbNailItem = ({url, description, likes, comments}) => {
+  const copyTemplateThumbnail = templateThumbnail.cloneNode(true);
+  const picture = copyTemplateThumbnail.querySelector('img');
+  const pictureLikes = copyTemplateThumbnail.querySelector('.picture__likes');
+  const pictureCommentCount = copyTemplateThumbnail.querySelector('.picture__comments');
+
+  picture.src = url;
+  picture.alt = description;
+  pictureLikes.textContent = likes;
+  pictureCommentCount.textContent = comments.length;
+
+  return copyTemplateThumbnail;
+};
+
+const fragment = document.createDocumentFragment();
+
+const renderGallery = (photos) => {
+  photos.forEach((photo) => {
+
+    const thumbnail = createThumbNailItem(photo);
+    fragment.append(thumbnail);
+  });
+};
+
+renderGallery(createPhotos(PHOTO_COUNT));
+
+picturesContainer.append(fragment);
