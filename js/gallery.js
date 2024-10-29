@@ -78,16 +78,15 @@ const createThumbNailItem = ({url, description, likes, comments}) => {
   return copyTemplateThumbnail;
 };
 
-const fragment = document.createDocumentFragment();
-
 const renderGallery = (photos) => {
-  photos.forEach((photo) => {
+  const fragment = document.createDocumentFragment();
 
+  photos.forEach((photo) => {
     const thumbnail = createThumbNailItem(photo);
     fragment.append(thumbnail);
   });
+
+  picturesContainer.append(fragment);
 };
 
 renderGallery(createPhotos(PHOTO_COUNT));
-
-picturesContainer.append(fragment);
