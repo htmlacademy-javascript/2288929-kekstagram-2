@@ -1,5 +1,8 @@
 import {getRandomInteger, getRandomArrayElement} from './utils.js';
 
+const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
+const picturesContainer = document.querySelector('.pictures');
+
 const MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -32,35 +35,58 @@ const DESCRIPTIONS = [
   'Телефон выпал из рук и получилось это! Решила оставить, не судите строго!!1один'
 ];
 
-const MIN_PHOTO_URL_ID = 1;
-const MAX_PHOTO_URL_ID = 25;
 const MIN_LIKES = 15;
 const MAX_LIKES = 200;
-const MIN_COMMENT_ID = 1;
-const MAX_COMMENT_ID = 800;
 const MIN_COMMENT_AVATAR_ID = 1;
 const MAX_COMMENT_AVATAR_ID = 6;
 const MIN_COMMENT_NUMBERS = 0;
 const MAX_COMMENT_NUMBERS = 30;
 const PHOTO_COUNT = 25;
 
-const createComment = () => ({
-  id: getRandomInteger(MIN_COMMENT_ID, MAX_COMMENT_ID),
+const createComment = (id) => ({
+  id,
   avatar: `img/avatar-${getRandomInteger(MIN_COMMENT_AVATAR_ID, MAX_COMMENT_AVATAR_ID)}.svg`,
   message: getRandomArrayElement(MESSAGES),
   name: getRandomArrayElement(NAMES)
 });
 
-const createComments = () => Array.from({length: getRandomInteger(MIN_COMMENT_NUMBERS, MAX_COMMENT_NUMBERS)}, createComment);
+const createComments = () => Array.from({length: getRandomInteger(MIN_COMMENT_NUMBERS, MAX_COMMENT_NUMBERS)},
+  (_, index) => createComment(index + 1));
 
 const createPhoto = (id) => ({
   id,
-  url: `photos/${getRandomInteger(MIN_PHOTO_URL_ID, MAX_PHOTO_URL_ID)}.jpg`,
+  url: `photos/${id}.jpg`,
   description: getRandomArrayElement(DESCRIPTIONS),
   likes: getRandomInteger(MIN_LIKES, MAX_LIKES),
   comments: createComments()
 });
 
-export const createPhotos = (length) => Array.from({length}, (_, index) => createPhoto(index + 1));
+export const createPhotos = (length) => Array.from({length},
+  (_, index) => createPhoto(index + 1));
 
-createPhotos(PHOTO_COUNT);
+const createThumbNailItem = ({url, description, likes, comments}) => {
+  const copyTemplateThumbnail = templateThumbnail.cloneNode(true);
+  const picture = copyTemplateThumbnail.querySelector('img');
+  const pictureLikes = copyTemplateThumbnail.querySelector('.picture__likes');
+  const pictureCommentCount = copyTemplateThumbnail.querySelector('.picture__comments');
+
+  picture.src = url;
+  picture.alt = description;
+  pictureLikes.textContent = likes;
+  pictureCommentCount.textContent = comments.length;
+
+  return copyTemplateThumbnail;
+};
+
+const renderGallery = (photos) => {
+  const fragment = document.createDocumentFragment();
+
+  photos.forEach((photo) => {
+    const thumbnail = createThumbNailItem(photo);
+    fragment.append(thumbnail);
+  });
+
+  picturesContainer.append(fragment);
+};
+
+renderGallery(createPhotos(PHOTO_COUNT));
