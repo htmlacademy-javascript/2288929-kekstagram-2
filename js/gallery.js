@@ -1,8 +1,5 @@
 import {getRandomInteger, getRandomArrayElement} from './utils.js';
 
-const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
-const picturesContainer = document.querySelector('.pictures');
-
 const MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -42,6 +39,9 @@ const MAX_COMMENT_AVATAR_ID = 6;
 const MIN_COMMENT_NUMBERS = 0;
 const MAX_COMMENT_NUMBERS = 30;
 const PHOTO_COUNT = 25;
+
+const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
+const picturesContainer = document.querySelector('.pictures');
 
 const createComment = (id) => ({
   id,
