@@ -38,7 +38,7 @@ const MIN_COMMENT_AVATAR_ID = 1;
 const MAX_COMMENT_AVATAR_ID = 6;
 const MIN_COMMENT_NUMBERS = 0;
 const MAX_COMMENT_NUMBERS = 30;
-const PHOTO_COUNT = 25;
+export const PHOTO_COUNT = 25;
 
 const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
 const picturesContainer = document.querySelector('.pictures');
@@ -64,21 +64,19 @@ const createPhoto = (id) => ({
 export const createPhotos = (length) => Array.from({length},
   (_, index) => createPhoto(index + 1));
 
-const createThumbNailItem = ({url, description, likes, comments}) => {
-  const copyTemplateThumbnail = templateThumbnail.cloneNode(true);
-  const picture = copyTemplateThumbnail.querySelector('img');
-  const pictureLikes = copyTemplateThumbnail.querySelector('.picture__likes');
-  const pictureCommentCount = copyTemplateThumbnail.querySelector('.picture__comments');
+const createThumbNailItem = ({url, description, likes, comments, id}) => {
+  const thumbnail = templateThumbnail.cloneNode(true);
 
-  picture.src = url;
-  picture.alt = description;
-  pictureLikes.textContent = likes;
-  pictureCommentCount.textContent = comments.length;
+  thumbnail.querySelector('.picture__img').src = url;
+  thumbnail.querySelector('.picture__img').alt = description;
+  thumbnail.querySelector('.picture__likes').textContent = likes;
+  thumbnail.querySelector('.picture__comments').textContent = comments.length;
+  thumbnail.querySelector('.picture__img').dataset.id = id;
 
-  return copyTemplateThumbnail;
+  return thumbnail;
 };
 
-const renderGallery = (photos) => {
+export const renderGallery = (photos) => {
   const fragment = document.createDocumentFragment();
 
   photos.forEach((photo) => {
