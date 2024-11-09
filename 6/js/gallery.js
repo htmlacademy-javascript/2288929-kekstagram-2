@@ -1,5 +1,5 @@
 import {getRandomInteger, getRandomArrayElement} from './utils.js';
-import {openBigPicture} from './bigPicture.js';
+import {openBigPicture} from './bigpicture.js';
 
 const MESSAGES = [
   'Всё отлично!',
@@ -63,7 +63,7 @@ const createPhoto = (id) => ({
   comments: createComments()
 });
 
-export const createPhotos = (length) => Array.from({length},
+const createPhotos = (length) => Array.from({length},
   (_, index) => createPhoto(index + 1));
 
 const photosArray = createPhotos(PHOTO_COUNT);
