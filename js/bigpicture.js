@@ -1,3 +1,5 @@
+import { isEscapeKey } from './dom.js';
+
 const body = document.querySelector('body');
 const bigPictureContainer = document.querySelector('.big-picture');
 const bigPicture = bigPictureContainer.querySelector('.big-picture__img').querySelector('img');
@@ -12,7 +14,7 @@ const commentsContainer = bigPictureContainer.querySelector('.social__comments')
 
 
 const onBigPictureKeydown = (evt) => {
-  if (evt.key === 'Escape') {
+  if (isEscapeKey) {
     evt.preventDefault();
     bigPictureContainer.classList.add('hidden');
     body.classList.remove('modal-open');
@@ -41,33 +43,34 @@ const renderComments = (comments) => {
   });
 };
 
-export const openBigPicture = (thumbnailData) => {
+export const openBigPicture = ({url, description, likes, comments}) => {
   bigPictureContainer.classList.remove('hidden');
   body.classList.add('modal-open');
   commentsCount.classList.add('hidden');
   commentsLoaderButton.classList.add('hidden');
 
-  bigPicture.src = thumbnailData.url;
-  descriptionBigPhoto.textContent = thumbnailData.description;
-  likesCountBigPhoto.textContent = thumbnailData.likes;
-  commentTotalCount.textContent = thumbnailData.comments.length;
-  commentShownCount.textContent = thumbnailData.comments.length;
+  bigPicture.src = url;
+  descriptionBigPhoto.textContent = description;
+  likesCountBigPhoto.textContent = likes;
+  commentTotalCount.textContent = comments.length;
+  commentShownCount.textContent = comments.length;
 
   commentsContainer.innerHTML = '';
-  renderComments(thumbnailData.comments);
+  renderComments(comments);
 
   document.addEventListener('keydown', onBigPictureKeydown);
 };
 
-const closeBipPicture = () => {
+const closeBigPicture = () => {
   bigPictureContainer.classList.add('hidden');
   body.classList.remove('modal-open');
   commentsCount.classList.remove('hidden');
   commentsLoaderButton.classList.remove('hidden');
+  commentsContainer.innerHTML = '';
 
   document.removeEventListener('keydown', onBigPictureKeydown);
 };
 
 bigPictureCloseButton.addEventListener('click', () => {
-  closeBipPicture();
+  closeBigPicture();
 });

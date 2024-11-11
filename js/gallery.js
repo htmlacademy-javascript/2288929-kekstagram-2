@@ -94,10 +94,11 @@ const renderGallery = (photos) => {
 renderGallery(photosArray);
 
 thumbnailsContainer.addEventListener('click', (evt) => {
-  const clickedThumbNail = evt.target.closest('.picture .picture__img[data-id]').dataset.id;
+  const thumbnail = evt.target.closest('.picture__img[data-id]');
 
-  if (clickedThumbNail) {
-    const photoData = photosArray.find((photo) => photo.id === +clickedThumbNail);
-    openBigPicture(photoData);
+  if (!thumbnail) {
+    return;
   }
+  const photoData = photosArray.find((photo) => photo.id === +thumbnail.dataset.id);
+  openBigPicture(photoData);
 });
