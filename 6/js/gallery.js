@@ -1,5 +1,5 @@
 import {getRandomInteger, getRandomArrayElement} from './utils.js';
-import {openBigPicture} from './bigpicture.js';
+import {openBigPicture} from './big-picture.js';
 
 const MESSAGES = [
   'Всё отлично!',
@@ -66,13 +66,14 @@ const createPhoto = (id) => ({
 const createPhotos = (length) => Array.from({length},
   (_, index) => createPhoto(index + 1));
 
-const photosArray = createPhotos(PHOTO_COUNT);
+const generatedPhotos = createPhotos(PHOTO_COUNT);
 
-const createThumbNailItem = ({url, description, likes, comments, id}) => {
+const createThumbnailItem = ({url, description, likes, comments, id}) => {
   const thumbnail = templateThumbnail.cloneNode(true);
+  const thumbnailImg = thumbnail.querySelector('.picture__img');
 
-  thumbnail.querySelector('.picture__img').src = url;
-  thumbnail.querySelector('.picture__img').alt = description;
+  thumbnailImg.src = url;
+  thumbnailImg.alt = description;
   thumbnail.querySelector('.picture__likes').textContent = likes;
   thumbnail.querySelector('.picture__comments').textContent = comments.length;
   thumbnail.querySelector('.picture__img').dataset.id = id;
@@ -84,14 +85,14 @@ const renderGallery = (photos) => {
   const fragment = document.createDocumentFragment();
 
   photos.forEach((photo) => {
-    const thumbnail = createThumbNailItem(photo);
+    const thumbnail = createThumbnailItem(photo);
     fragment.append(thumbnail);
   });
 
   picturesContainer.append(fragment);
 };
 
-renderGallery(photosArray);
+renderGallery(generatedPhotos);
 
 thumbnailsContainer.addEventListener('click', (evt) => {
   const thumbnail = evt.target.closest('.picture__img[data-id]');
@@ -99,6 +100,12 @@ thumbnailsContainer.addEventListener('click', (evt) => {
   if (!thumbnail) {
     return;
   }
-  const photoData = photosArray.find((photo) => photo.id === +thumbnail.dataset.id);
+
+  const photoData = generatedPhotos.find((photo) => photo.id === +thumbnail.dataset.id);
+
+  if (!photoData) {
+    return;
+  }
+
   openBigPicture(photoData);
 });
