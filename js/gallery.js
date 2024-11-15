@@ -1,7 +1,5 @@
 import {getRandomInteger, getRandomArrayElement} from './utils.js';
-
-const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
-const picturesContainer = document.querySelector('.pictures');
+import {openBigPicture} from './big-picture.js';
 
 const MESSAGES = [
   'Всё отлично!',
@@ -43,6 +41,10 @@ const MIN_COMMENT_NUMBERS = 0;
 const MAX_COMMENT_NUMBERS = 30;
 const PHOTO_COUNT = 25;
 
+const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
+const picturesContainer = document.querySelector('.pictures');
+const thumbnailsContainer = document.querySelector('.pictures');
+
 const createComment = (id) => ({
   id,
   avatar: `img/avatar-${getRandomInteger(MIN_COMMENT_AVATAR_ID, MAX_COMMENT_AVATAR_ID)}.svg`,
@@ -61,32 +63,49 @@ const createPhoto = (id) => ({
   comments: createComments()
 });
 
-export const createPhotos = (length) => Array.from({length},
+const createPhotos = (length) => Array.from({length},
   (_, index) => createPhoto(index + 1));
 
-const createThumbNailItem = ({url, description, likes, comments}) => {
-  const copyTemplateThumbnail = templateThumbnail.cloneNode(true);
-  const picture = copyTemplateThumbnail.querySelector('img');
-  const pictureLikes = copyTemplateThumbnail.querySelector('.picture__likes');
-  const pictureCommentCount = copyTemplateThumbnail.querySelector('.picture__comments');
+const generatedPhotos = createPhotos(PHOTO_COUNT);
 
-  picture.src = url;
-  picture.alt = description;
-  pictureLikes.textContent = likes;
-  pictureCommentCount.textContent = comments.length;
+const createThumbnailItem = ({url, description, likes, comments, id}) => {
+  const thumbnail = templateThumbnail.cloneNode(true);
+  const thumbnailImg = thumbnail.querySelector('.picture__img');
 
-  return copyTemplateThumbnail;
+  thumbnailImg.src = url;
+  thumbnailImg.alt = description;
+  thumbnail.querySelector('.picture__likes').textContent = likes;
+  thumbnail.querySelector('.picture__comments').textContent = comments.length;
+  thumbnail.querySelector('.picture__img').dataset.id = id;
+
+  return thumbnail;
 };
 
 const renderGallery = (photos) => {
   const fragment = document.createDocumentFragment();
 
   photos.forEach((photo) => {
-    const thumbnail = createThumbNailItem(photo);
+    const thumbnail = createThumbnailItem(photo);
     fragment.append(thumbnail);
   });
 
   picturesContainer.append(fragment);
 };
 
-renderGallery(createPhotos(PHOTO_COUNT));
+renderGallery(generatedPhotos);
+
+thumbnailsContainer.addEventListener('click', (evt) => {
+  const thumbnail = evt.target.closest('.picture__img[data-id]');
+
+  if (!thumbnail) {
+    return;
+  }
+
+  const photoData = generatedPhotos.find((photo) => photo.id === +thumbnail.dataset.id);
+
+  if (!photoData) {
+    return;
+  }
+
+  openBigPicture(photoData);
+});
