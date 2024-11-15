@@ -13,7 +13,7 @@ const commentsContainer = bigPictureContainer.querySelector('.social__comments')
 const templateComment = document.querySelector('#user-comment').content.querySelector('.social__comment');
 
 const onBigPictureKeydown = (evt) => {
-  if (isEscapeKey(evt)) {
+  if (isEscapeKey(evt.key)) {
     evt.preventDefault();
     closeBigPicture();
   }
@@ -53,12 +53,8 @@ export const openBigPicture = ({url, description, likes, comments}) => {
   commentsContainer.innerHTML = '';
   renderComments(comments);
 
-  if (comments.length > 0) {
+  if (comments.length) {
     commentsCount.classList.remove('hidden');
-  }
-
-  if (comments.length > 5) {
-    commentsLoaderButton.classList.remove('hidden');
   }
 
   document.addEventListener('keydown', onBigPictureKeydown);
