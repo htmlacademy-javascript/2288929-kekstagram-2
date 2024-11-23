@@ -76,7 +76,7 @@ const createThumbnailItem = ({url, description, likes, comments, id}) => {
   thumbnailImg.alt = description;
   thumbnail.querySelector('.picture__likes').textContent = likes;
   thumbnail.querySelector('.picture__comments').textContent = comments.length;
-  thumbnail.querySelector('.picture__img').dataset.id = id;
+  thumbnail.dataset.id = id;
 
   return thumbnail;
 };
@@ -95,7 +95,7 @@ const renderGallery = (photos) => {
 renderGallery(generatedPhotos);
 
 thumbnailsContainer.addEventListener('click', (evt) => {
-  const thumbnail = evt.target.closest('.picture__img[data-id]');
+  const thumbnail = evt.target.closest('.picture[data-id]');
 
   if (!thumbnail) {
     return;
