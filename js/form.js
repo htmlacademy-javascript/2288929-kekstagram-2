@@ -32,3 +32,19 @@ uploadInput.addEventListener('change', () => {
   resetButton.addEventListener('click', onResetButtonClose);
   document.addEventListener('keydown', onFormModalKeydown);
 });
+
+const pristine = new Pristine(form, {
+  classTo: 'img-upload__field-wrapper',
+  errorTextParent: 'img-upload__field-wrapper',
+  errorTextTag: 'div',
+  errorTextClass: 'img-upload__field-wrapper--error'
+});
+
+const validateComment = (value) => value.length <= 140;
+
+pristine.addValidator(commentInput, validateComment, 'Не более 140 символов');
+
+form.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  pristine.validate();
+});
