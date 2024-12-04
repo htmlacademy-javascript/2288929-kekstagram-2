@@ -1,21 +1,21 @@
 import { isEscapeKey } from './utils.js';
 
+const MAX_COMMENT_LENGTH = 140;
+const MAX_HASHTAG_COUNT = 5;
+const HASHTAG_FORMAT_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
 const form = document.querySelector('.img-upload__form');
 const uploadInput = form.querySelector('.img-upload__input');
 const uploadOverlay = form.querySelector('.img-upload__overlay');
 const resetButton = form.querySelector('.img-upload__cancel');
 const hashtagInput = form.querySelector('.text__hashtags');
 const commentInput = form.querySelector('.text__description');
-const MAX_COMMENT_LENGTH = 140;
-const MAX_HASHTAG_COUNT = 5;
-const hastagRegex = /^#[a-zа-яё0-9]{1,19}$/i;
 
 const onFormModalKeydown = (evt) => {
-  const disableCloseOnFocusInput = !(document.activeElement === hashtagInput || document.activeElement === commentInput);
+  const isTextInputActive = document.activeElement === hashtagInput || document.activeElement === commentInput;
 
-  if (isEscapeKey(evt.key) && disableCloseOnFocusInput) {
+  if (isEscapeKey(evt.key) && !isTextInputActive) {
     evt.preventDefault();
-    onResetButtonClose();
+    closeform();
   }
 };
 
@@ -24,11 +24,11 @@ function closeform () {
   document.body.classList.remove('modal-open');
   uploadInput.value = '';
 
-  resetButton.removeEventListener('click', onResetButtonClose);
+  resetButton.removeEventListener('click', onResetButtonClick);
   document.removeEventListener('keydown', onFormModalKeydown);
 }
 
-function onResetButtonClose () {
+function onResetButtonClick () {
   closeform();
 }
 
@@ -36,7 +36,7 @@ uploadInput.addEventListener('change', () => {
   uploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
 
-  resetButton.addEventListener('click', onResetButtonClose);
+  resetButton.addEventListener('click', onResetButtonClick);
   document.addEventListener('keydown', onFormModalKeydown);
 });
 
@@ -51,29 +51,30 @@ const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
 
 pristine.addValidator(commentInput, validateComment, `Не более ${MAX_COMMENT_LENGTH} символов`);
 
+const isValidCount = (hashtags) => hashtags.length <= MAX_HASHTAG_COUNT;
+
+const hasDuplicate = (hashtags) => new Set(hashtags).size === hashtags.length;
+
+const isValidFormat = (hashtags) => {
+  for (const hashtag of hashtags) {
+    if (!HASHTAG_FORMAT_REGEX.test(hashtag)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 const validateHashtag = (input) => {
   const trimmedInput = input.trim();
 
   if (trimmedInput === '') {
     return true;
   }
+
   const hashtags = trimmedInput.split(/\s+/);
 
-  const isValidCount = () => hashtags.length <= MAX_HASHTAG_COUNT;
-
-  const hasDuplicate = () => new Set(hashtags).size === hashtags.length;
-
-  const isValidFormat = () => {
-    for (const hashtag of hashtags) {
-      if (!hastagRegex.test(hashtag)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  return isValidCount() && hasDuplicate() && isValidFormat();
+  return isValidCount(hashtags) && hasDuplicate(hashtags) && isValidFormat(hashtags);
 };
 
 pristine.addValidator(hashtagInput, validateHashtag, 'Хештеги не валидны');
