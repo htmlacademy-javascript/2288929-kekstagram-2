@@ -3,6 +3,7 @@ import { isEscapeKey } from './utils.js';
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
 const HASHTAG_FORMAT_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
+
 const form = document.querySelector('.img-upload__form');
 const uploadInput = form.querySelector('.img-upload__input');
 const uploadOverlay = form.querySelector('.img-upload__overlay');
