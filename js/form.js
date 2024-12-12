@@ -18,6 +18,16 @@ const scaleControlSmaller = form.querySelector('.scale__control--smaller');
 const scaleControlBigger = form.querySelector('.scale__control--bigger');
 const scaleControl = form.querySelector('.scale__control--value');
 const uploadImage = form.querySelector('.img-upload__preview').querySelector('img');
+const effectContainer = form.querySelector('.img-upload__effect-level');
+const effectControl = effectContainer.querySelector('.effect-level__value');
+const effectSlider = effectContainer.querySelector('.effect-level__slider');
+
+noUiSlider.create(effectSlider, {
+  range: {
+    min: 0,
+    max: 1},
+  start: 1
+});
 
 const updateScaleValue = (newValue) => {
   scaleControl.value = `${newValue}%`;
