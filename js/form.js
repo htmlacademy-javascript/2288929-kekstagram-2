@@ -6,6 +6,7 @@ const HASHTAG_FORMAT_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
 const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
+const DEFALUT_SCALE_VALUE = 100;
 
 const form = document.querySelector('.img-upload__form');
 const uploadInput = form.querySelector('.img-upload__input');
@@ -55,6 +56,7 @@ function closeform () {
   uploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
   uploadInput.value = '';
+  updateScaleValue(DEFALUT_SCALE_VALUE);
 
   resetButton.removeEventListener('click', onResetButtonClick);
   document.removeEventListener('keydown', onFormModalKeydown);
