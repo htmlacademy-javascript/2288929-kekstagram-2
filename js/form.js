@@ -7,6 +7,41 @@ const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
 const DEFALUT_SCALE_VALUE = 100;
+const FilterEffects = {
+  default: '',
+  chrome: {
+    title: 'grayscale',
+    minRange: 0,
+    maxRange: 1,
+    step: 0.1
+  },
+  sepia: {
+    title: 'sepia',
+    minRange: 0,
+    maxRange: 1,
+    step: 0.1,
+  },
+  marvin: {
+    title: 'invert',
+    minRange: 0,
+    maxRange: 100,
+    step: 1,
+    unit: '%'
+  },
+  phobos: {
+    title: 'blur',
+    minRange: 0,
+    maxRange: 3,
+    step: 0.1,
+    unit: 'px'
+  },
+  heat: {
+    title: 'brightness',
+    minRange: 1,
+    maxRange: 3,
+    step: 0.1,
+  }
+};
 
 const form = document.querySelector('.img-upload__form');
 const uploadInput = form.querySelector('.img-upload__input');
@@ -18,15 +53,69 @@ const scaleControlSmaller = form.querySelector('.scale__control--smaller');
 const scaleControlBigger = form.querySelector('.scale__control--bigger');
 const scaleControl = form.querySelector('.scale__control--value');
 const uploadImage = form.querySelector('.img-upload__preview').querySelector('img');
-const effectContainer = form.querySelector('.img-upload__effect-level');
-const effectControl = effectContainer.querySelector('.effect-level__value');
-const effectSlider = effectContainer.querySelector('.effect-level__slider');
+const sliderContainer = form.querySelector('.img-upload__effect-level');
+const sliderControl = sliderContainer.querySelector('.effect-level__value');
+const slider = sliderContainer.querySelector('.effect-level__slider');
+const effectscontainer = form.querySelector('.effects__list');
 
-noUiSlider.create(effectSlider, {
+noUiSlider.create(slider, {
   range: {
     min: 0,
-    max: 1},
-  start: 1
+    max: 1
+  },
+  start: 1,
+  step: 0.1,
+  connect: 'lower'
+});
+
+const resetFilter = () => {
+  sliderContainer.classList.add('hidden');
+  uploadImage.style.filter = '';
+  uploadImage.removeAttribute('style');
+  slider.noUiSlider.off('update');
+};
+
+const updateFilter = (effectName) => {
+  if (effectName === 'none') {
+    resetFilter();
+    return;
+  }
+
+  const {minRange, maxRange, step} = FilterEffects[effectName];
+
+  const sliderOptions = {
+    range: {min: minRange, max: maxRange},
+    step: step,
+  };
+
+  sliderContainer.classList.remove('hidden');
+  slider.noUiSlider.updateOptions(sliderOptions);
+  slider.noUiSlider.set(100);
+  applyFilter(effectName, 100);
+
+  slider.noUiSlider.off('update');
+
+  slider.noUiSlider.on('update', () => {
+    const sliderValue = parseFloat(slider.noUiSlider.get());
+    applyFilter(effectName, sliderValue);
+  });
+};
+
+function applyFilter (effectName, sliderValue) {
+  const {title, unit = ''} = FilterEffects[effectName];
+  sliderControl.value = sliderValue;
+  uploadImage.style.filter = `${title}(${sliderValue}${unit})`;
+}
+
+effectscontainer.addEventListener('click', (evt) => {
+  const effectItem = evt.target.closest('.effects__radio');
+
+  if (!effectItem) {
+    return;
+  }
+
+  const effectName = effectItem.value;
+  updateFilter(effectName);
 });
 
 const updateScaleValue = (newValue) => {
@@ -67,6 +156,8 @@ function closeform () {
   document.body.classList.remove('modal-open');
   uploadInput.value = '';
   updateScaleValue(DEFALUT_SCALE_VALUE);
+
+  resetFilter();
 
   resetButton.removeEventListener('click', onResetButtonClick);
   document.removeEventListener('keydown', onFormModalKeydown);
