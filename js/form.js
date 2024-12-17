@@ -7,38 +7,39 @@ const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
 const DEFALUT_SCALE_VALUE = 100;
+
 const FilterEffects = {
   default: '',
   chrome: {
     title: 'grayscale',
-    minRange: 0,
-    maxRange: 1,
+    min: 0,
+    max: 1,
     step: 0.1
   },
   sepia: {
     title: 'sepia',
-    minRange: 0,
-    maxRange: 1,
+    min: 0,
+    max: 1,
     step: 0.1,
   },
   marvin: {
     title: 'invert',
-    minRange: 0,
-    maxRange: 100,
+    min: 0,
+    max: 100,
     step: 1,
     unit: '%'
   },
   phobos: {
     title: 'blur',
-    minRange: 0,
-    maxRange: 3,
+    min: 0,
+    max: 3,
     step: 0.1,
     unit: 'px'
   },
   heat: {
     title: 'brightness',
-    minRange: 1,
-    maxRange: 3,
+    min: 1,
+    max: 3,
     step: 0.1,
   }
 };
@@ -52,11 +53,11 @@ const commentInput = form.querySelector('.text__description');
 const scaleControlSmaller = form.querySelector('.scale__control--smaller');
 const scaleControlBigger = form.querySelector('.scale__control--bigger');
 const scaleControl = form.querySelector('.scale__control--value');
-const uploadImage = form.querySelector('.img-upload__preview').querySelector('img');
-const sliderContainer = form.querySelector('.img-upload__effect-level');
-const sliderControl = sliderContainer.querySelector('.effect-level__value');
-const slider = sliderContainer.querySelector('.effect-level__slider');
-const effectscontainer = form.querySelector('.effects__list');
+const imageUploadPreview = form.querySelector('.img-upload__preview').querySelector('img');
+const imageUploadEffectLevel = form.querySelector('.img-upload__effect-level');
+const effectLevelValue = imageUploadEffectLevel.querySelector('.effect-level__value');
+const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
+const effectsContainer = form.querySelector('.effects__list');
 
 noUiSlider.create(slider, {
   range: {
@@ -69,45 +70,37 @@ noUiSlider.create(slider, {
 });
 
 const resetFilter = () => {
-  sliderContainer.classList.add('hidden');
-  uploadImage.style.filter = '';
-  uploadImage.removeAttribute('style');
+  imageUploadEffectLevel.classList.add('hidden');
+  imageUploadPreview.style.filter = '';
+  imageUploadPreview.removeAttribute('style');
   slider.noUiSlider.off('update');
 };
 
-const updateFilter = (effectName) => {
-  if (effectName === 'none') {
-    resetFilter();
-    return;
-  }
+const applyFilter = (title, value, unit) => {
+  effectLevelValue.value = value;
+  imageUploadPreview.style.filter = `${title}(${value}${unit})`;
+};
 
-  const {minRange, maxRange, step} = FilterEffects[effectName];
+const updateFilter = (config) => {
+  const {title, min, max, step, unit = ''} = config;
 
   const sliderOptions = {
-    range: {min: minRange, max: maxRange},
-    step: step,
+    range: {min, max},
+    step,
   };
 
-  sliderContainer.classList.remove('hidden');
+  imageUploadEffectLevel.classList.remove('hidden');
   slider.noUiSlider.updateOptions(sliderOptions);
-  slider.noUiSlider.set(100);
-  applyFilter(effectName, 100);
-
-  slider.noUiSlider.off('update');
+  slider.noUiSlider.set(max);
+  applyFilter(title, max, unit);
 
   slider.noUiSlider.on('update', () => {
     const sliderValue = parseFloat(slider.noUiSlider.get());
-    applyFilter(effectName, sliderValue);
+    applyFilter(title, sliderValue, unit);
   });
 };
 
-function applyFilter (effectName, sliderValue) {
-  const {title, unit = ''} = FilterEffects[effectName];
-  sliderControl.value = sliderValue;
-  uploadImage.style.filter = `${title}(${sliderValue}${unit})`;
-}
-
-effectscontainer.addEventListener('click', (evt) => {
+effectsContainer.addEventListener('click', (evt) => {
   const effectItem = evt.target.closest('.effects__radio');
 
   if (!effectItem) {
@@ -115,26 +108,35 @@ effectscontainer.addEventListener('click', (evt) => {
   }
 
   const effectName = effectItem.value;
-  updateFilter(effectName);
+  const config = FilterEffects[effectName];
+
+  if (effectName === 'none') {
+    resetFilter();
+    return;
+  }
+
+  updateFilter(config);
 });
 
 const updateScaleValue = (newValue) => {
   scaleControl.value = `${newValue}%`;
   const imageScaleStyle = newValue / 100;
-  uploadImage.style.transform = `scale(${imageScaleStyle})`;
+  imageUploadPreview.style.transform = `scale(${imageScaleStyle})`;
 };
 
-const scaleImageSmaller = () => {
-  let currentValue = parseInt(scaleControl.value, 10);
+const getNumeralValue = (value) => parseInt(value, 10);
 
-  currentValue = currentValue > MIN_SCALE_VALUE ? currentValue - SCALE_VALUE_STEP : currentValue;
+const scaleImageSmaller = () => {
+  let currentValue = getNumeralValue(scaleControl.value);
+
+  currentValue = Math.max(currentValue - SCALE_VALUE_STEP, MIN_SCALE_VALUE);
   updateScaleValue(currentValue);
 };
 
 const scaleImageBigger = () => {
-  let currentValue = parseInt(scaleControl.value, 10);
+  let currentValue = getNumeralValue(scaleControl.value);
 
-  currentValue = currentValue < MAX_SCALE_VALUE ? currentValue + SCALE_VALUE_STEP : currentValue;
+  currentValue = Math.min(currentValue + SCALE_VALUE_STEP, MAX_SCALE_VALUE);
   updateScaleValue(currentValue);
 };
 
