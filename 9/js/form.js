@@ -9,7 +9,7 @@ const MAX_SCALE_VALUE = 100;
 const DEFALUT_SCALE_VALUE = 100;
 
 const FilterEffects = {
-  default: '',
+  default: null,
   chrome: {
     title: 'grayscale',
     min: 0,
@@ -58,6 +58,7 @@ const imageUploadEffectLevel = form.querySelector('.img-upload__effect-level');
 const effectLevelValue = imageUploadEffectLevel.querySelector('.effect-level__value');
 const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
 const effectsContainer = form.querySelector('.effects__list');
+let activeFilter = null;
 
 noUiSlider.create(slider, {
   range: {
@@ -69,35 +70,40 @@ noUiSlider.create(slider, {
   connect: 'lower'
 });
 
-const resetFilter = () => {
-  imageUploadEffectLevel.classList.add('hidden');
-  imageUploadPreview.style.filter = '';
-  imageUploadPreview.removeAttribute('style');
-  slider.noUiSlider.off('update');
-};
-
 const applyFilter = (title, value, unit) => {
   effectLevelValue.value = value;
   imageUploadPreview.style.filter = `${title}(${value}${unit})`;
 };
 
+slider.noUiSlider.on('update', () => {
+  if (!activeFilter) {
+    return;
+  }
+
+  const {title, unit = ''} = activeFilter;
+
+  const sliderValue = parseFloat(slider.noUiSlider.get());
+  applyFilter(title, sliderValue, unit);
+});
+
+const resetFilter = () => {
+  activeFilter = null;
+  imageUploadEffectLevel.classList.add('hidden');
+  imageUploadPreview.style.filter = '';
+  imageUploadPreview.removeAttribute('style');
+};
+
 const updateFilter = (config) => {
-  const {title, min, max, step, unit = ''} = config;
+  activeFilter = config;
+  const { min, max, step = ''} = config;
 
   const sliderOptions = {
     range: {min, max},
     step,
   };
 
-  imageUploadEffectLevel.classList.remove('hidden');
   slider.noUiSlider.updateOptions(sliderOptions);
   slider.noUiSlider.set(max);
-  applyFilter(title, max, unit);
-
-  slider.noUiSlider.on('update', () => {
-    const sliderValue = parseFloat(slider.noUiSlider.get());
-    applyFilter(title, sliderValue, unit);
-  });
 };
 
 effectsContainer.addEventListener('click', (evt) => {
@@ -108,12 +114,14 @@ effectsContainer.addEventListener('click', (evt) => {
   }
 
   const effectName = effectItem.value;
-  const config = FilterEffects[effectName];
+  const config = FilterEffects[effectName] ?? FilterEffects.default;
 
-  if (effectName === 'none') {
+  if (!config) {
     resetFilter();
     return;
   }
+
+  imageUploadEffectLevel.classList.remove('hidden');
 
   updateFilter(config);
 });
@@ -124,20 +132,20 @@ const updateScaleValue = (newValue) => {
   imageUploadPreview.style.transform = `scale(${imageScaleStyle})`;
 };
 
-const getNumeralValue = (value) => parseInt(value, 10);
+const getCurrentScaleValue = (value) => parseInt(value, 10);
 
 const scaleImageSmaller = () => {
-  let currentValue = getNumeralValue(scaleControl.value);
+  const currentScaleValue = getCurrentScaleValue(scaleControl.value);
 
-  currentValue = Math.max(currentValue - SCALE_VALUE_STEP, MIN_SCALE_VALUE);
-  updateScaleValue(currentValue);
+  const calculatedScaleValue = Math.max(currentScaleValue - SCALE_VALUE_STEP, MIN_SCALE_VALUE);
+  updateScaleValue(calculatedScaleValue);
 };
 
 const scaleImageBigger = () => {
-  let currentValue = getNumeralValue(scaleControl.value);
+  const currentScaleValue = getCurrentScaleValue(scaleControl.value);
 
-  currentValue = Math.min(currentValue + SCALE_VALUE_STEP, MAX_SCALE_VALUE);
-  updateScaleValue(currentValue);
+  const calculatedScaleValue = Math.min(currentScaleValue + SCALE_VALUE_STEP, MAX_SCALE_VALUE);
+  updateScaleValue(calculatedScaleValue);
 };
 
 const onScaleControlSmallerClick = () => scaleImageSmaller();
