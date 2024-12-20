@@ -132,19 +132,15 @@ const updateScaleValue = (newValue) => {
   imageUploadPreview.style.transform = `scale(${imageScaleStyle})`;
 };
 
-const getCurrentScaleValue = (value) => parseInt(value, 10);
+const getCurrentScaleValue = () => parseInt(scaleControl.value, 10);
 
 const scaleImageSmaller = () => {
-  const currentScaleValue = getCurrentScaleValue(scaleControl.value);
-
-  const calculatedScaleValue = Math.max(currentScaleValue - SCALE_VALUE_STEP, MIN_SCALE_VALUE);
+  const calculatedScaleValue = Math.max(getCurrentScaleValue() - SCALE_VALUE_STEP, MIN_SCALE_VALUE);
   updateScaleValue(calculatedScaleValue);
 };
 
 const scaleImageBigger = () => {
-  const currentScaleValue = getCurrentScaleValue(scaleControl.value);
-
-  const calculatedScaleValue = Math.min(currentScaleValue + SCALE_VALUE_STEP, MAX_SCALE_VALUE);
+  const calculatedScaleValue = Math.min(getCurrentScaleValue() + SCALE_VALUE_STEP, MAX_SCALE_VALUE);
   updateScaleValue(calculatedScaleValue);
 };
 
