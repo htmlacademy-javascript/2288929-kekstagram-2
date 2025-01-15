@@ -8,3 +8,9 @@ export const getUserPhotos = () =>
       return response.json();
     });
 
+export const sendUserPhoto = (photo, onSuccess) =>
+  fetch('https://31.javascript.htmlacademy.pro/kekstagram', {
+    method: 'POST',
+    body: photo,
+  },
+  ).then(onSuccess);

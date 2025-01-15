@@ -1,4 +1,5 @@
 import { isEscapeKey } from './utils.js';
+import { sendUserPhoto } from './server.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -224,7 +225,14 @@ const validateHashtag = (input) => {
 
 pristine.addValidator(hashtagInput, validateHashtag, 'Хештеги не валидны');
 
-form.addEventListener('submit', (evt) => {
+const userFormSubmit = (evt) => {
   evt.preventDefault();
-  pristine.validate();
-});
+  const isValid = pristine.validate();
+
+  if (isValid) {
+    const formData = new FormData(evt.target);
+    sendUserPhoto(formData, closeform);
+  }
+};
+
+form.addEventListener('submit', userFormSubmit);
