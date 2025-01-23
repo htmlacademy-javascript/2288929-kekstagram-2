@@ -1,4 +1,5 @@
 import { isEscapeKey } from './utils.js';
+import { showMessage } from './utils.js';
 import { sendUserPhoto } from './server.js';
 
 const MAX_COMMENT_LENGTH = 140;
@@ -7,7 +8,7 @@ const HASHTAG_FORMAT_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
 const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
-const DEFALUT_SCALE_VALUE = 100;
+const DEFAULT_SCALE_VALUE = 100;
 
 const FilterEffects = {
   default: null,
@@ -92,6 +93,7 @@ const resetFilter = () => {
   imageUploadEffectLevel.classList.add('hidden');
   imageUploadPreview.style.filter = '';
   imageUploadPreview.removeAttribute('style');
+  form.reset();
 };
 
 const updateFilter = (config) => {
@@ -162,12 +164,12 @@ function closeform () {
   uploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
   uploadInput.value = '';
-  updateScaleValue(DEFALUT_SCALE_VALUE);
+  updateScaleValue(DEFAULT_SCALE_VALUE);
 
   resetFilter();
 
   resetButton.removeEventListener('click', onResetButtonClick);
-  document.removeEventListener('keydown', onFormModalKeydown);
+  window.removeEventListener('keydown', onFormModalKeydown);
   scaleControlSmaller.removeEventListener('click', onScaleControlSmallerClick);
   scaleControlBigger.removeEventListener('click', onScaleControlBiggerClick);
 }
@@ -181,7 +183,7 @@ uploadInput.addEventListener('change', () => {
   document.body.classList.add('modal-open');
 
   resetButton.addEventListener('click', onResetButtonClick);
-  document.addEventListener('keydown', onFormModalKeydown);
+  window.addEventListener('keydown', onFormModalKeydown);
   scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
   scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
 });
@@ -231,7 +233,15 @@ const userFormSubmit = (evt) => {
 
   if (isValid) {
     const formData = new FormData(evt.target);
-    sendUserPhoto(formData, closeform);
+
+    sendUserPhoto(formData)
+      .then(() => {
+        closeform();
+        showMessage('#success', '.success', '.success__inner', '.success__button');
+      })
+      .catch(() => {
+        showMessage('#error', '.error', '.error__inner', '.error__button');
+      });
   }
 };
 
