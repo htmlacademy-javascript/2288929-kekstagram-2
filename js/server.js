@@ -17,7 +17,7 @@ export const getData = () =>
     });
 
 export const sendData = (body) =>
-  fetch(`${BASE_URL}${Route.SEND_DATA_DATA}`,
+  fetch(`${BASE_URL}${Route.SEND_DATA}`,
     {
       method: 'POST',
       body,
