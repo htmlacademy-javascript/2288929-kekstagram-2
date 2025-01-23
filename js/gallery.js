@@ -1,5 +1,5 @@
 import {openBigPicture} from './big-picture.js';
-import { getUserPhotos } from './server.js';
+import { getData } from './server.js';
 
 let userPhotos = [];
 
@@ -33,7 +33,7 @@ const renderGallery = (photos) => {
   picturesContainer.append(fragment);
 };
 
-getUserPhotos()
+getData()
   .then((photos) => {
     renderGallery(photos);
   });

@@ -1,6 +1,5 @@
-import { isEscapeKey } from './utils.js';
-import { showMessage } from './utils.js';
-import { sendUserPhoto } from './server.js';
+import { isEscapeKey, showMessage } from './utils.js';
+import { sendData } from './server.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -234,7 +233,7 @@ const userFormSubmit = (evt) => {
   if (isValid) {
     const formData = new FormData(evt.target);
 
-    sendUserPhoto(formData)
+    sendData(formData)
       .then(() => {
         closeform();
         showMessage('#success', '.success', '.success__inner', '.success__button');

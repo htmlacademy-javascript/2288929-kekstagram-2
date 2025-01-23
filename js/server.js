@@ -1,7 +1,13 @@
 import { showDataError} from './utils';
 
-export const getUserPhotos = () =>
-  fetch('https://31.javascript.htmlacademy.pro/kekstagram/data')
+const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
+const Route = {
+  GET_DATA : '/data',
+  SEND_DATA: '/',
+};
+
+export const getData = () =>
+  fetch(`${BASE_URL}${Route.GET_DATA}`)
     .then((response) => {
       if (!response.ok) {
         showDataError();
@@ -10,8 +16,8 @@ export const getUserPhotos = () =>
       return response.json();
     });
 
-export const sendUserPhoto = (body) =>
-  fetch('https://31.javascript.htmlacademy.pro/kekstagram',
+export const sendData = (body) =>
+  fetch(`${BASE_URL}${Route.SEND_DATA_DATA}`,
     {
       method: 'POST',
       body,
