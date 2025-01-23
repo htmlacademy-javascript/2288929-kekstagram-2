@@ -1,4 +1,3 @@
-
 export const isEscapeKey = (key) => key === 'Escape';
 
 export const showDataError = () => {
