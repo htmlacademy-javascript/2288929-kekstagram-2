@@ -21,8 +21,6 @@ const createThumbnailItem = ({url, description, likes, comments, id}) => {
 };
 
 const renderGallery = (photos) => {
-  userPhotos = photos;
-
   const fragment = document.createDocumentFragment();
 
   photos.forEach((photo) => {
@@ -35,6 +33,7 @@ const renderGallery = (photos) => {
 
 getData()
   .then((photos) => {
+    userPhotos = photos;
     renderGallery(photos);
   });
 
