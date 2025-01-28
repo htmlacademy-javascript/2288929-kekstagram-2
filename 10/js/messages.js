@@ -44,6 +44,11 @@ export const showMessage = (templateSelector) => {
 
 function closeMessage() {
   const message = document.querySelector('[data-message]');
+
+  if (!message) {
+    return;
+  }
+
   const closeButton = message.querySelector('button[type="button"]');
 
   document.removeEventListener('keydown', onMessageKeydown, true);
