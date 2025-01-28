@@ -1,4 +1,5 @@
-import { isEscapeKey, showMessage } from './utils.js';
+import { isEscapeKey } from './utils.js';
+import { showMessage } from './messages.js';
 import { sendData } from './server.js';
 
 const MAX_COMMENT_LENGTH = 140;
@@ -59,6 +60,7 @@ const imageUploadEffectLevel = form.querySelector('.img-upload__effect-level');
 const effectLevelValue = imageUploadEffectLevel.querySelector('.effect-level__value');
 const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
 const effectsContainer = form.querySelector('.effects__list');
+const buttonSubmit = form.querySelector('.img-upload__submit');
 let activeFilter = null;
 
 noUiSlider.create(slider, {
@@ -168,7 +170,7 @@ function closeform () {
   resetFilter();
 
   resetButton.removeEventListener('click', onResetButtonClick);
-  window.removeEventListener('keydown', onFormModalKeydown);
+  document.removeEventListener('keydown', onFormModalKeydown);
   scaleControlSmaller.removeEventListener('click', onScaleControlSmallerClick);
   scaleControlBigger.removeEventListener('click', onScaleControlBiggerClick);
 }
@@ -182,7 +184,7 @@ uploadInput.addEventListener('change', () => {
   document.body.classList.add('modal-open');
 
   resetButton.addEventListener('click', onResetButtonClick);
-  window.addEventListener('keydown', onFormModalKeydown);
+  document.addEventListener('keydown', onFormModalKeydown);
   scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
   scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
 });
@@ -226,22 +228,32 @@ const validateHashtag = (input) => {
 
 pristine.addValidator(hashtagInput, validateHashtag, 'Хештеги не валидны');
 
-const userFormSubmit = (evt) => {
+const blockSubmitButton = () => {
+  buttonSubmit.disabled = true;
+};
+
+const unblockSubmitButton = () => {
+  buttonSubmit.disabled = false;
+};
+
+const onUserFormSubmit = (evt) => {
   evt.preventDefault();
   const isValid = pristine.validate();
 
   if (isValid) {
+    blockSubmitButton();
     const formData = new FormData(evt.target);
 
     sendData(formData)
       .then(() => {
         closeform();
-        showMessage('#success', '.success', '.success__inner', '.success__button');
+        showMessage('#success');
       })
       .catch(() => {
-        showMessage('#error', '.error', '.error__inner', '.error__button');
-      });
+        showMessage('#error');
+      })
+      .finally(unblockSubmitButton);
   }
 };
 
-form.addEventListener('submit', userFormSubmit);
+form.addEventListener('submit', onUserFormSubmit);
