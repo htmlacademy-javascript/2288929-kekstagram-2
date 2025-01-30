@@ -1,4 +1,4 @@
-import { showDataError} from './messages.js';
+import { showDataError} from './dialogs.js';
 
 const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
 const Route = {

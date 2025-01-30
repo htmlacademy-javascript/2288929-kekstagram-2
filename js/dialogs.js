@@ -3,6 +3,7 @@ import { isEscapeKey } from './utils.js';
 const ERROR_MESSAGE_TIMEOUT = 5000;
 
 const templateErrorMessage = document.querySelector('#data-error').content.querySelector('.data-error');
+let currentDialog;
 
 export const showDataError = () => {
   const template = templateErrorMessage.cloneNode(true);
@@ -13,46 +14,37 @@ export const showDataError = () => {
   }, ERROR_MESSAGE_TIMEOUT);
 };
 
-const onCloseButtonClick = () => closeMessage();
-
 const onMessageKeydown = (evt) => {
   if (isEscapeKey(evt.key)) {
     evt.stopPropagation();
-    closeMessage();
+    closeDialog();
   }
 };
 
 const onOutsideMessageClick = (evt) => {
-  if (!evt.target.closest('[data-message] div')) {
-    closeMessage();
+  if (!evt.target.closest('[data-message]') || evt.target.closest('button[type="button"]')) {
+    closeDialog();
   }
 };
 
-export const showMessage = (templateSelector) => {
-  const template = document.querySelector(templateSelector);
+export const showDialog = (template) => {
   const message = template.content.cloneNode(true);
 
-  message.firstElementChild.setAttribute('data-message', '');
   document.body.append(message);
 
-  const closeButton = document.querySelector('[data-message] button[type="button"]');
+  currentDialog = document.querySelector('[data-message-section]');
 
   document.addEventListener('click', onOutsideMessageClick);
   document.addEventListener('keydown', onMessageKeydown, true);
-  closeButton.addEventListener('click', onCloseButtonClick);
 };
 
-function closeMessage() {
-  const message = document.querySelector('[data-message]');
-
-  if (!message) {
+function closeDialog() {
+  if (!currentDialog) {
     return;
   }
 
-  const closeButton = message.querySelector('button[type="button"]');
-
   document.removeEventListener('keydown', onMessageKeydown, true);
-  closeButton.removeEventListener('click', onCloseButtonClick);
   document.removeEventListener('click', onOutsideMessageClick);
-  message.remove();
+  currentDialog.remove();
+  currentDialog = null;
 }
