@@ -202,9 +202,9 @@
   </template>
 
   <!-- Сообщение с ошибкой загрузки изображения -->
-  <template id="error">
-    <section class="error">
-      <div class="error__inner">
+  <template id="error" data-message="error">
+    <section class="error" data-message-section>
+      <div class="error__inner" data-message>
         <h2 class="error__title">Ошибка загрузки файла</h2>
         <button type="button" class="error__button">Попробовать ещё раз</button>
       </div>
@@ -212,9 +212,9 @@
   </template>
 
   <!-- Сообщение об успешной загрузке изображения -->
-  <template id="success">
-    <section class="success">
-      <div class="success__inner">
+  <template id="success" data-message="success">
+    <section class="success" data-message-section>
+      <div class="success__inner" data-message>
         <h2 class="success__title">Изображение успешно загружено</h2>
         <button type="button" class="success__button">Круто!</button>
       </div>

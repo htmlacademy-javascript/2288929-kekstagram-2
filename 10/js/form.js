@@ -1,5 +1,5 @@
 import { isEscapeKey } from './utils.js';
-import { showMessage } from './messages.js';
+import { showDialog } from './dialogs.js';
 import { sendData } from './server.js';
 
 const MAX_COMMENT_LENGTH = 140;
@@ -9,6 +9,11 @@ const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
 const DEFAULT_SCALE_VALUE = 100;
+
+const SubmitButtonText = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Публикую...'
+};
 
 const FilterEffects = {
   default: null,
@@ -61,6 +66,9 @@ const effectLevelValue = imageUploadEffectLevel.querySelector('.effect-level__va
 const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
 const effectsContainer = form.querySelector('.effects__list');
 const buttonSubmit = form.querySelector('.img-upload__submit');
+const errorTemlate = document.querySelector('#error');
+const successTemplate = document.querySelector('#success');
+
 let activeFilter = null;
 
 noUiSlider.create(slider, {
@@ -228,12 +236,11 @@ const validateHashtag = (input) => {
 
 pristine.addValidator(hashtagInput, validateHashtag, 'Хештеги не валидны');
 
-const blockSubmitButton = () => {
-  buttonSubmit.disabled = true;
-};
+const toggleSubmitButton = (state) => {
+  buttonSubmit.disabled = state;
 
-const unblockSubmitButton = () => {
-  buttonSubmit.disabled = false;
+  buttonSubmit.textContent = state ?
+    SubmitButtonText.SENDING : SubmitButtonText.IDLE;
 };
 
 const onUserFormSubmit = (evt) => {
@@ -241,18 +248,20 @@ const onUserFormSubmit = (evt) => {
   const isValid = pristine.validate();
 
   if (isValid) {
-    blockSubmitButton();
+    toggleSubmitButton(true);
     const formData = new FormData(evt.target);
 
     sendData(formData)
       .then(() => {
         closeform();
-        showMessage('#success');
+        showDialog(successTemplate);
       })
       .catch(() => {
-        showMessage('#error');
+        showDialog(errorTemlate);
       })
-      .finally(unblockSubmitButton);
+      .finally(() => {
+        toggleSubmitButton(false);
+      });
   }
 };
 
