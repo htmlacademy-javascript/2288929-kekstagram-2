@@ -1,4 +1,6 @@
 import { isEscapeKey } from './utils.js';
+import { showDialog } from './dialogs.js';
+import { sendData } from './server.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -6,7 +8,12 @@ const HASHTAG_FORMAT_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
 const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
-const DEFALUT_SCALE_VALUE = 100;
+const DEFAULT_SCALE_VALUE = 100;
+
+const SubmitButtonText = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Публикую...'
+};
 
 const FilterEffects = {
   default: null,
@@ -58,6 +65,10 @@ const imageUploadEffectLevel = form.querySelector('.img-upload__effect-level');
 const effectLevelValue = imageUploadEffectLevel.querySelector('.effect-level__value');
 const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
 const effectsContainer = form.querySelector('.effects__list');
+const buttonSubmit = form.querySelector('.img-upload__submit');
+const errorTemlate = document.querySelector('#error');
+const successTemplate = document.querySelector('#success');
+
 let activeFilter = null;
 
 noUiSlider.create(slider, {
@@ -91,6 +102,7 @@ const resetFilter = () => {
   imageUploadEffectLevel.classList.add('hidden');
   imageUploadPreview.style.filter = '';
   imageUploadPreview.removeAttribute('style');
+  form.reset();
 };
 
 const updateFilter = (config) => {
@@ -132,19 +144,15 @@ const updateScaleValue = (newValue) => {
   imageUploadPreview.style.transform = `scale(${imageScaleStyle})`;
 };
 
-const getCurrentScaleValue = (value) => parseInt(value, 10);
+const getCurrentScaleValue = () => parseInt(scaleControl.value, 10);
 
 const scaleImageSmaller = () => {
-  const currentScaleValue = getCurrentScaleValue(scaleControl.value);
-
-  const calculatedScaleValue = Math.max(currentScaleValue - SCALE_VALUE_STEP, MIN_SCALE_VALUE);
+  const calculatedScaleValue = Math.max(getCurrentScaleValue() - SCALE_VALUE_STEP, MIN_SCALE_VALUE);
   updateScaleValue(calculatedScaleValue);
 };
 
 const scaleImageBigger = () => {
-  const currentScaleValue = getCurrentScaleValue(scaleControl.value);
-
-  const calculatedScaleValue = Math.min(currentScaleValue + SCALE_VALUE_STEP, MAX_SCALE_VALUE);
+  const calculatedScaleValue = Math.min(getCurrentScaleValue() + SCALE_VALUE_STEP, MAX_SCALE_VALUE);
   updateScaleValue(calculatedScaleValue);
 };
 
@@ -165,7 +173,7 @@ function closeform () {
   uploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
   uploadInput.value = '';
-  updateScaleValue(DEFALUT_SCALE_VALUE);
+  updateScaleValue(DEFAULT_SCALE_VALUE);
 
   resetFilter();
 
@@ -228,7 +236,33 @@ const validateHashtag = (input) => {
 
 pristine.addValidator(hashtagInput, validateHashtag, 'Хештеги не валидны');
 
-form.addEventListener('submit', (evt) => {
+const toggleSubmitButton = (state) => {
+  buttonSubmit.disabled = state;
+
+  buttonSubmit.textContent = state ?
+    SubmitButtonText.SENDING : SubmitButtonText.IDLE;
+};
+
+const onUserFormSubmit = (evt) => {
   evt.preventDefault();
-  pristine.validate();
-});
+  const isValid = pristine.validate();
+
+  if (isValid) {
+    toggleSubmitButton(true);
+    const formData = new FormData(evt.target);
+
+    sendData(formData)
+      .then(() => {
+        closeform();
+        showDialog(successTemplate);
+      })
+      .catch(() => {
+        showDialog(errorTemlate);
+      })
+      .finally(() => {
+        toggleSubmitButton(false);
+      });
+  }
+};
+
+form.addEventListener('submit', onUserFormSubmit);
