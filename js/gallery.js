@@ -6,6 +6,7 @@ let userPhotos = [];
 const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
 const picturesContainer = document.querySelector('.pictures');
 const thumbnailsContainer = document.querySelector('.pictures');
+const filtersSection = document.querySelector('.img-filters');
 
 const createThumbnailItem = ({url, description, likes, comments, id}) => {
   const thumbnail = templateThumbnail.cloneNode(true);
@@ -31,10 +32,16 @@ const renderGallery = (photos) => {
   picturesContainer.append(fragment);
 };
 
+const showFilters = () => filtersSection.classList.remove('img-filters--inactive');
+
+
 getData()
   .then((photos) => {
     userPhotos = photos;
     renderGallery(photos);
+  })
+  .then(() => {
+    showFilters();
   });
 
 thumbnailsContainer.addEventListener('click', (evt) => {
