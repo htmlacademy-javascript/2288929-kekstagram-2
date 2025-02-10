@@ -7,6 +7,7 @@ const templateThumbnail = document.querySelector('#picture').content.querySelect
 const picturesContainer = document.querySelector('.pictures');
 const thumbnailsContainer = document.querySelector('.pictures');
 const filtersSection = document.querySelector('.img-filters');
+const filtersForm = filtersSection.querySelector('.img-filters__form');
 
 const createThumbnailItem = ({url, description, likes, comments, id}) => {
   const thumbnail = templateThumbnail.cloneNode(true);
@@ -34,7 +35,6 @@ const renderGallery = (photos) => {
 
 const showFilters = () => filtersSection.classList.remove('img-filters--inactive');
 
-
 getData()
   .then((photos) => {
     userPhotos = photos;
@@ -43,6 +43,22 @@ getData()
   .then(() => {
     showFilters();
   });
+
+
+filtersForm.addEventListener('click', (evt) => {
+  if (!evt.target.classList.contains('img-filters__button')) {
+    return;
+  }
+  const activeButton = filtersForm.querySelector('.img-filters__button--active');
+
+  if (activeButton === evt.target) {
+    return;
+  }
+
+  activeButton?.classList.remove('img-filters__button--active');
+
+  evt.target.classList.add('img-filters__button--active');
+});
 
 thumbnailsContainer.addEventListener('click', (evt) => {
   const thumbnail = evt.target.closest('.picture[data-id]');
