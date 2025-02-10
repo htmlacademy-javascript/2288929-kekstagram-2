@@ -21,8 +21,10 @@ const onDocumentKeydown = (evt) => {
   }
 };
 
-const onDocumentOutsideDialogClick = (evt) => {
-  if (!evt.target.closest('[data-message]') || evt.target.closest('button[type="button"]')) {
+const onDocumentClick = (evt) => {
+  const isClickOutsideDialog = !evt.target.closest('[data-message]') || evt.target.closest('button[type="button"]');
+
+  if (isClickOutsideDialog) {
     closeDialog();
   }
 };
@@ -32,7 +34,7 @@ export const showDialog = (dialogElement) => {
 
   document.body.append(currentDialog);
 
-  document.addEventListener('click', onDocumentOutsideDialogClick);
+  document.addEventListener('click', onDocumentClick);
   document.addEventListener('keydown', onDocumentKeydown, true);
 };
 
@@ -42,7 +44,7 @@ function closeDialog() {
   }
 
   document.removeEventListener('keydown', onDocumentKeydown, true);
-  document.removeEventListener('click', onDocumentOutsideDialogClick);
+  document.removeEventListener('click', onDocumentClick);
   currentDialog.remove();
   currentDialog = null;
 }
