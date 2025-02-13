@@ -1,6 +1,8 @@
 import {openBigPicture} from './big-picture.js';
 import { getData } from './server.js';
-import { createUniqueIds } from './utils.js';
+import { createUniqueIds, debounce } from './utils.js';
+
+const RANDOM_PHOTO_COUNT = 10;
 
 const FilterSortingAction = {
   'filter-default': onDefalutSortButtonClick,
@@ -13,8 +15,6 @@ const picturesContainer = document.querySelector('.pictures');
 const thumbnailsContainer = document.querySelector('.pictures');
 const filtersSection = document.querySelector('.img-filters');
 const filtersForm = filtersSection.querySelector('.img-filters__form');
-const RANDOM_PHOTO_COUNT = 10;
-
 let userPhotos = [];
 
 const createThumbnailItem = ({url, description, likes, comments, id}) => {

@@ -1,3 +1,5 @@
+const DEBOUNCE_TIMEOUT_TIME = 500;
+
 export const isEscapeKey = (key) => key === 'Escape';
 
 const getRandomInteger = (a, b) => {
@@ -17,3 +19,13 @@ export const createUniqueIds = (minId, maxId, countId) => {
 
   return uniqueIds;
 };
+
+export function debounce (callback, timeoutDelay = DEBOUNCE_TIMEOUT_TIME) {
+  let timeoutId;
+
+  return (...rest) => {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+}
