@@ -67,7 +67,9 @@ const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
 const effectsContainer = form.querySelector('.effects__list');
 const buttonSubmit = form.querySelector('.img-upload__submit');
 const errorTemlate = document.querySelector('#error');
+const errorDialog = errorTemlate.content.querySelector('[data-message-section]');
 const successTemplate = document.querySelector('#success');
+const successDialog = successTemplate.content.querySelector('[data-message-section]');
 
 let activeFilter = null;
 
@@ -254,10 +256,10 @@ const onUserFormSubmit = (evt) => {
     sendData(formData)
       .then(() => {
         closeform();
-        showDialog(successTemplate);
+        showDialog(successDialog);
       })
       .catch(() => {
-        showDialog(errorTemlate);
+        showDialog(errorDialog);
       })
       .finally(() => {
         toggleSubmitButton(false);
