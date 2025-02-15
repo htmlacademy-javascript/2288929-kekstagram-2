@@ -4,7 +4,7 @@ import { createUniqueIds, debounce } from './utils.js';
 
 const RANDOM_PHOTO_COUNT = 10;
 
-const FilterSortingAction = {
+const GallerySortingAction = {
   'filter-default': onDefalutSortButtonClick,
   'filter-random': onRandomSortButtonClick,
   'filter-discussed': onDiscussedSortButtonClick
@@ -15,6 +15,7 @@ const picturesContainer = document.querySelector('.pictures');
 const thumbnailsContainer = document.querySelector('.pictures');
 const filtersSection = document.querySelector('.img-filters');
 const filtersForm = filtersSection.querySelector('.img-filters__form');
+let lastSelectedFilterId = 'filter-default';
 let userPhotos = [];
 
 const createThumbnailItem = ({url, description, likes, comments, id}) => {
@@ -52,7 +53,22 @@ getData()
     showPhotoFilters();
   });
 
-filtersForm.addEventListener('click', (evt) => {
+const filterGallery = (buttonId) => {
+  const action = GallerySortingAction[buttonId];
+  action();
+};
+
+const debouncedFilterGallery = debounce((newFilterId) => {
+  if (newFilterId === lastSelectedFilterId) {
+    return;
+  }
+
+  lastSelectedFilterId = newFilterId;
+
+  filterGallery(newFilterId);
+});
+
+const onGalleryFiltersClick = (evt) => {
   if (!evt.target.classList.contains('img-filters__button')) {
     return;
   }
@@ -67,12 +83,12 @@ filtersForm.addEventListener('click', (evt) => {
 
   evt.target.classList.add('img-filters__button--active');
 
-  const action = FilterSortingAction[evt.target.id];
+  const newFilterId = evt.target.id;
 
-  if (typeof action === 'function') {
-    action();
-  }
-});
+  debouncedFilterGallery(newFilterId);
+};
+
+filtersForm.addEventListener('click', onGalleryFiltersClick);
 
 thumbnailsContainer.addEventListener('click', (evt) => {
   const thumbnail = evt.target.closest('.picture[data-id]');
@@ -90,12 +106,7 @@ thumbnailsContainer.addEventListener('click', (evt) => {
   openBigPicture(photoData);
 });
 
-const clearPhotos = () => {
-  const thumbnails = document.querySelectorAll('.picture');
-  const fragment = document.createDocumentFragment();
-
-  thumbnails.forEach((thumbnail) => fragment.append(thumbnail));
-};
+const clearPhotos = () => picturesContainer.querySelectorAll('.picture').forEach((thumbnail) => thumbnail.remove());
 
 const sortPhotosDiscussed = (photoA, photoB) => photoB.comments.length - photoA.comments.length;
 

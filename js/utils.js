@@ -1,4 +1,4 @@
-const DEBOUNCE_TIMEOUT_TIME = 500;
+const DEBOUNCE_DELAY = 500;
 
 export const isEscapeKey = (key) => key === 'Escape';
 
@@ -10,6 +10,10 @@ const getRandomInteger = (a, b) => {
 };
 
 export const createUniqueIds = (minId, maxId, countId) => {
+  if (countId > maxId - minId + 1) {
+    return;
+  }
+
   const uniqueIds = new Set();
 
   while (uniqueIds.size < countId) {
@@ -20,7 +24,7 @@ export const createUniqueIds = (minId, maxId, countId) => {
   return uniqueIds;
 };
 
-export function debounce (callback, timeoutDelay = DEBOUNCE_TIMEOUT_TIME) {
+export function debounce (callback, timeoutDelay = DEBOUNCE_DELAY) {
   let timeoutId;
 
   return (...rest) => {
