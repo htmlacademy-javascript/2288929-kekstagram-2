@@ -22,7 +22,7 @@ const onDocumentKeydown = (evt) => {
 };
 
 const onDocumentClick = (evt) => {
-  const isClickOutsideDialog = !evt.target.closest('[data-message]') || evt.target.closest('button[type="button"]');
+  const isClickOutsideDialog = evt.target.matches('[data-overlay]') || evt.target.closest('button[type="button"]');
 
   if (isClickOutsideDialog) {
     closeDialog();

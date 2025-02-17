@@ -5,9 +5,9 @@ import { createUniqueIds, debounce } from './utils.js';
 const RANDOM_PHOTO_COUNT = 10;
 
 const GallerySortingAction = {
-  'filter-default': onDefalutSortButtonClick,
-  'filter-random': onRandomSortButtonClick,
-  'filter-discussed': onDiscussedSortButtonClick
+  'filter-default': sortByDefault,
+  'filter-random': sortByRandom,
+  'filter-discussed': sortByDiscussed
 };
 
 const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
@@ -15,7 +15,7 @@ const picturesContainer = document.querySelector('.pictures');
 const thumbnailsContainer = document.querySelector('.pictures');
 const filtersSection = document.querySelector('.img-filters');
 const filtersForm = filtersSection.querySelector('.img-filters__form');
-let lastSelectedFilterId = 'filter-default';
+let activeFilter = 'filter-default';
 let userPhotos = [];
 
 const createThumbnailItem = ({url, description, likes, comments, id}) => {
@@ -42,7 +42,7 @@ const renderGallery = (photos) => {
   picturesContainer.append(fragment);
 };
 
-const showPhotoFilters = () => filtersSection.classList.remove('img-filters--inactive');
+const initFilters = () => filtersSection.classList.remove('img-filters--inactive');
 
 getData()
   .then((photos) => {
@@ -50,42 +50,35 @@ getData()
     renderGallery(photos);
   })
   .then(() => {
-    showPhotoFilters();
+    initFilters();
   });
 
-const filterGallery = (buttonId) => {
-  const action = GallerySortingAction[buttonId];
-  action();
-};
-
 const debouncedFilterGallery = debounce((newFilterId) => {
-  if (newFilterId === lastSelectedFilterId) {
+  if (newFilterId === activeFilter) {
     return;
   }
 
-  lastSelectedFilterId = newFilterId;
+  activeFilter = newFilterId;
 
-  filterGallery(newFilterId);
+  const action = GallerySortingAction[newFilterId];
+  action();
 });
 
-const onGalleryFiltersClick = (evt) => {
-  if (!evt.target.classList.contains('img-filters__button')) {
+const onGalleryFiltersClick = ({target}) => {
+  if (!target.classList.contains('img-filters__button')) {
     return;
   }
 
   const activeButton = filtersForm.querySelector('.img-filters__button--active');
 
-  if (activeButton === evt.target) {
+  if (activeButton === target) {
     return;
   }
 
   activeButton?.classList.remove('img-filters__button--active');
+  target.classList.add('img-filters__button--active');
 
-  evt.target.classList.add('img-filters__button--active');
-
-  const newFilterId = evt.target.id;
-
-  debouncedFilterGallery(newFilterId);
+  debouncedFilterGallery(target.id);
 };
 
 filtersForm.addEventListener('click', onGalleryFiltersClick);
@@ -108,24 +101,20 @@ thumbnailsContainer.addEventListener('click', (evt) => {
 
 const clearPhotos = () => picturesContainer.querySelectorAll('.picture').forEach((thumbnail) => thumbnail.remove());
 
-const sortPhotosDiscussed = (photoA, photoB) => photoB.comments.length - photoA.comments.length;
-
-function onDiscussedSortButtonClick () {
+function sortByDiscussed () {
   clearPhotos();
 
-  const sortedPhotos = userPhotos
-    .slice()
-    .sort(sortPhotosDiscussed);
+  const sortedPhotos = userPhotos.toSorted((photoA, photoB) => photoB.comments.length - photoA.comments.length);
 
   renderGallery(sortedPhotos);
 }
 
-function onDefalutSortButtonClick () {
+function sortByDefault () {
   clearPhotos();
   renderGallery(userPhotos);
 }
 
-function onRandomSortButtonClick () {
+function sortByRandom () {
   clearPhotos();
 
   const uniqueIds = createUniqueIds(userPhotos[0].id, userPhotos[userPhotos.length - 1].id, RANDOM_PHOTO_COUNT);
