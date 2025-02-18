@@ -1,4 +1,4 @@
-import { debounce, createUniqueIds } from './utils.js';
+import { debounce, shuffle } from './utils.js';
 import { getUserPhotos, renderGallery } from './gallery.js';
 
 const RANDOM_PHOTO_COUNT = 10;
@@ -12,7 +12,6 @@ const GallerySortingAction = {
 const picturesContainer = document.querySelector('.pictures');
 const filtersSection = document.querySelector('.img-filters');
 const filtersForm = filtersSection.querySelector('.img-filters__form');
-
 let activeFilter = 'filter-default';
 
 const clearPhotos = () => picturesContainer.querySelectorAll('.picture').forEach((thumbnail) => thumbnail.remove());
@@ -20,18 +19,18 @@ const clearPhotos = () => picturesContainer.querySelectorAll('.picture').forEach
 const applyFilters = (filterPhotos) => {
   const userPhotos = getUserPhotos();
   const filtredPhotos = filterPhotos ? filterPhotos(userPhotos) : userPhotos;
+  clearPhotos();
   renderGallery(filtredPhotos);
 };
 
 const debouncedFilterGallery = debounce((newFilterId) => {
-
   if (newFilterId === activeFilter) {
     return;
   }
+
   activeFilter = newFilterId;
   const action = GallerySortingAction[newFilterId];
 
-  clearPhotos();
   action();
 });
 
@@ -54,7 +53,6 @@ const onGalleryFiltersClick = ({target}) => {
 
 filtersForm.addEventListener('click', onGalleryFiltersClick);
 
-
 function sortByDiscussed () {
   applyFilters((photos) => photos.toSorted((photoA, photoB) => photoB.comments.length - photoA.comments.length));
 }
@@ -64,8 +62,5 @@ function sortByDefault () {
 }
 
 function sortByRandom () {
-  applyFilters((photos) => {
-    const uniqueIds = createUniqueIds(photos[0].id, photos[photos.length - 1].id, RANDOM_PHOTO_COUNT);
-    return photos.filter((item) => uniqueIds.has(item.id));
-  });
+  applyFilters((photos) => shuffle(photos).slice(0, RANDOM_PHOTO_COUNT));
 }

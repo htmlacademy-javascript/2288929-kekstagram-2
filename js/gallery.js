@@ -32,11 +32,11 @@ export const renderGallery = (photos) => {
 
 export const initGallery = (photos) => {
   userPhotos = photos;
+
   renderGallery(photos);
 };
 
 export const getUserPhotos = () => userPhotos;
-
 
 thumbnailsContainer.addEventListener('click', (evt) => {
   const thumbnail = evt.target.closest('.picture[data-id]');
