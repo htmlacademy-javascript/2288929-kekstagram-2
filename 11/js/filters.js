@@ -1,4 +1,4 @@
-import { debounce, shuffle } from './utils.js';
+import { debounce } from './utils.js';
 import { getUserPhotos, renderGallery } from './gallery.js';
 
 const RANDOM_PHOTO_COUNT = 10;
@@ -62,5 +62,5 @@ function sortByDefault () {
 }
 
 function sortByRandom () {
-  applyFilters((photos) => shuffle(photos).slice(0, RANDOM_PHOTO_COUNT));
+  applyFilters((photos) => photos.toSorted(() => Math.random() - 0.5).slice(0, RANDOM_PHOTO_COUNT));
 }
