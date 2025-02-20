@@ -38,7 +38,7 @@ const onGalleryFiltersClick = ({target}) => {
     return;
   }
 
-  const activeButton = filtersForm.querySelector(ACTIVE_FILTER_BUTTON_CLASS);
+  const activeButton = filtersForm.querySelector(`.${ACTIVE_FILTER_BUTTON_CLASS}`);
 
   if (activeButton === target) {
     return;
