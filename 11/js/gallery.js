@@ -6,6 +6,8 @@ const thumbnailsContainer = document.querySelector('.pictures');
 
 let userPhotos = [];
 
+export const clearPhotos = () => picturesContainer.querySelectorAll('.picture').forEach((thumbnail) => thumbnail.remove());
+
 const createThumbnailItem = ({url, description, likes, comments, id}) => {
   const thumbnail = templateThumbnail.cloneNode(true);
   const thumbnailImg = thumbnail.querySelector('.picture__img');
