@@ -1,11 +1,12 @@
 import {openBigPicture} from './big-picture.js';
-import { getData } from './server.js';
-
-let userPhotos = [];
 
 const templateThumbnail = document.querySelector('#picture').content.querySelector('.picture');
 const picturesContainer = document.querySelector('.pictures');
 const thumbnailsContainer = document.querySelector('.pictures');
+
+let userPhotos = [];
+
+export const clearPhotos = () => picturesContainer.querySelectorAll('.picture').forEach((thumbnail) => thumbnail.remove());
 
 const createThumbnailItem = ({url, description, likes, comments, id}) => {
   const thumbnail = templateThumbnail.cloneNode(true);
@@ -20,7 +21,7 @@ const createThumbnailItem = ({url, description, likes, comments, id}) => {
   return thumbnail;
 };
 
-const renderGallery = (photos) => {
+export const renderGallery = (photos) => {
   const fragment = document.createDocumentFragment();
 
   photos.forEach((photo) => {
@@ -31,11 +32,13 @@ const renderGallery = (photos) => {
   picturesContainer.append(fragment);
 };
 
-getData()
-  .then((photos) => {
-    userPhotos = photos;
-    renderGallery(photos);
-  });
+export const initGallery = (photos) => {
+  userPhotos = photos;
+
+  renderGallery(photos);
+};
+
+export const getUserPhotos = () => userPhotos;
 
 thumbnailsContainer.addEventListener('click', (evt) => {
   const thumbnail = evt.target.closest('.picture[data-id]');
@@ -52,3 +55,4 @@ thumbnailsContainer.addEventListener('click', (evt) => {
 
   openBigPicture(photoData);
 });
+

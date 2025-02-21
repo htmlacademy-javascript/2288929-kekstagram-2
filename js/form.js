@@ -67,7 +67,9 @@ const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
 const effectsContainer = form.querySelector('.effects__list');
 const buttonSubmit = form.querySelector('.img-upload__submit');
 const errorTemlate = document.querySelector('#error');
+const errorDialog = errorTemlate.content.querySelector('[data-overlay]');
 const successTemplate = document.querySelector('#success');
+const successDialog = successTemplate.content.querySelector('[data-overlay]');
 
 let activeFilter = null;
 
@@ -165,11 +167,11 @@ const onFormModalKeydown = (evt) => {
 
   if (isEscapeKey(evt.key) && !isTextInputActive) {
     evt.preventDefault();
-    closeform();
+    closeForm();
   }
 };
 
-function closeform () {
+function closeForm () {
   uploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
   uploadInput.value = '';
@@ -184,7 +186,7 @@ function closeform () {
 }
 
 function onResetButtonClick () {
-  closeform();
+  closeForm();
 }
 
 uploadInput.addEventListener('change', () => {
@@ -253,11 +255,11 @@ const onUserFormSubmit = (evt) => {
 
     sendData(formData)
       .then(() => {
-        closeform();
-        showDialog(successTemplate);
+        closeForm();
+        showDialog(successDialog);
       })
       .catch(() => {
-        showDialog(errorTemlate);
+        showDialog(errorDialog);
       })
       .finally(() => {
         toggleSubmitButton(false);

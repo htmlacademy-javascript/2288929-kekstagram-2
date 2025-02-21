@@ -14,28 +14,28 @@ export const showDataError = () => {
   }, ERROR_MESSAGE_TIMEOUT);
 };
 
-const onMessageKeydown = (evt) => {
+const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt.key)) {
     evt.stopPropagation();
     closeDialog();
   }
 };
 
-const onOutsideMessageClick = (evt) => {
-  if (!evt.target.closest('[data-message]') || evt.target.closest('button[type="button"]')) {
+const onDocumentClick = (evt) => {
+  const isOverlayOrButton = evt.target.matches('[data-overlay]') || evt.target.closest('button[type="button"]');
+
+  if (isOverlayOrButton) {
     closeDialog();
   }
 };
 
-export const showDialog = (template) => {
-  const message = template.content.cloneNode(true);
+export const showDialog = (dialogElement) => {
+  currentDialog = dialogElement.cloneNode(true);
 
-  document.body.append(message);
+  document.body.append(currentDialog);
 
-  currentDialog = document.querySelector('[data-message-section]');
-
-  document.addEventListener('click', onOutsideMessageClick);
-  document.addEventListener('keydown', onMessageKeydown, true);
+  document.addEventListener('click', onDocumentClick);
+  document.addEventListener('keydown', onDocumentKeydown, true);
 };
 
 function closeDialog() {
@@ -43,8 +43,8 @@ function closeDialog() {
     return;
   }
 
-  document.removeEventListener('keydown', onMessageKeydown, true);
-  document.removeEventListener('click', onOutsideMessageClick);
+  document.removeEventListener('keydown', onDocumentKeydown, true);
+  document.removeEventListener('click', onDocumentClick);
   currentDialog.remove();
   currentDialog = null;
 }

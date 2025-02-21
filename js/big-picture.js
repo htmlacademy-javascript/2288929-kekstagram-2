@@ -15,7 +15,7 @@ const COMMENT_PER_CLICK = 5;
 let currentComment = [];
 let currentCommentCount = 0;
 
-const onBigPictureKeydown = (evt) => {
+const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt.key)) {
     evt.preventDefault();
     onBigPictureClose();
@@ -79,7 +79,7 @@ export const openBigPicture = ({url, description, likes, comments}) => {
     commentsCount.classList.remove('hidden');
   }
 
-  document.addEventListener('keydown', onBigPictureKeydown);
+  document.addEventListener('keydown', onDocumentKeydown);
   bigPictureCloseButton.addEventListener('click', onBigPictureClose);
   commentsLoaderButton.addEventListener('click', onCommentsLoaderButtonClick);
 };
@@ -94,7 +94,7 @@ function onBigPictureClose () {
   commentShownCount.textContent = '';
   commentsContainer.innerHTML = '';
 
-  document.removeEventListener('keydown', onBigPictureKeydown);
+  document.removeEventListener('keydown', onDocumentKeydown);
   bigPictureCloseButton.removeEventListener('click', onBigPictureClose);
   commentsLoaderButton.removeEventListener('click', onCommentsLoaderButtonClick);
 }
