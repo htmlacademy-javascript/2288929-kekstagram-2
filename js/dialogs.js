@@ -3,6 +3,7 @@ import { isEscapeKey } from './utils.js';
 const ERROR_MESSAGE_TIMEOUT = 5000;
 
 const templateErrorMessage = document.querySelector('#data-error').content.querySelector('.data-error');
+
 let currentDialog;
 
 export const showDataError = () => {
@@ -22,9 +23,9 @@ const onDocumentKeydown = (evt) => {
 };
 
 const onDocumentClick = (evt) => {
-  const isOverlayOrButton = evt.target.matches('[data-overlay]') || evt.target.closest('button[type="button"]');
+  const isClosableElem = evt.target.matches('[data-overlay]') || evt.target.closest('button[type="button"]');
 
-  if (isOverlayOrButton) {
+  if (isClosableElem) {
     closeDialog();
   }
 };

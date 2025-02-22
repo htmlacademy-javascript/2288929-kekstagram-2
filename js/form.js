@@ -14,7 +14,6 @@ const SubmitButtonText = {
   IDLE: 'Опубликовать',
   SENDING: 'Публикую...'
 };
-
 const FilterEffects = {
   default: null,
   chrome: {
