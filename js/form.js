@@ -2,17 +2,14 @@ import { isEscapeKey } from './utils.js';
 import { showDataError, showDialog } from './dialogs.js';
 import { sendData } from './server.js';
 import { uploadFile } from './form-file-upload.js';
+import { isTextInputActive, isValid } from './form-validation.js';
 
-const MAX_COMMENT_LENGTH = 140;
-const MAX_HASHTAG_COUNT = 5;
-const HASHTAG_FORMAT_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
 const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
 const DEFAULT_SCALE_VALUE = 100;
 const FILE_TYPES = ['.jpg', '.jpeg', '.png', '.webp'];
 const ERROR_FILE_UPLOAD_TEXT = 'Можно загружать только изображения';
-
 
 const SubmitButtonText = {
   IDLE: 'Опубликовать',
@@ -58,8 +55,7 @@ const form = document.querySelector('.img-upload__form');
 const uploadInput = form.querySelector('.img-upload__input');
 const uploadOverlay = form.querySelector('.img-upload__overlay');
 const resetButton = form.querySelector('.img-upload__cancel');
-const hashtagInput = form.querySelector('.text__hashtags');
-const commentInput = form.querySelector('.text__description');
+
 const scaleControlSmaller = form.querySelector('.scale__control--smaller');
 const scaleControlBigger = form.querySelector('.scale__control--bigger');
 const scaleControl = form.querySelector('.scale__control--value');
@@ -167,8 +163,6 @@ const onScaleControlSmallerClick = () => scaleImageSmaller();
 const onScaleControlBiggerClick = () => scaleImageBigger();
 
 const onFormModalKeydown = (evt) => {
-  const isTextInputActive = document.activeElement === hashtagInput || document.activeElement === commentInput;
-
   if (isEscapeKey(evt.key) && !isTextInputActive) {
     evt.preventDefault();
     closeForm();
@@ -216,45 +210,6 @@ uploadInput.addEventListener('change', () => {
   }
 });
 
-const pristine = new Pristine(form, {
-  classTo: 'img-upload__field-wrapper',
-  errorTextParent: 'img-upload__field-wrapper',
-  errorTextTag: 'div',
-  errorTextClass: 'img-upload__field-wrapper--error'
-});
-
-const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
-
-pristine.addValidator(commentInput, validateComment, `Не более ${MAX_COMMENT_LENGTH} символов`);
-
-const isValidCount = (hashtags) => hashtags.length <= MAX_HASHTAG_COUNT;
-
-const hasDuplicate = (hashtags) => new Set(hashtags).size === hashtags.length;
-
-const isValidFormat = (hashtags) => {
-  for (const hashtag of hashtags) {
-    if (!HASHTAG_FORMAT_REGEX.test(hashtag)) {
-      return false;
-    }
-  }
-
-  return true;
-};
-
-const validateHashtag = (input) => {
-  const trimmedInput = input.trim();
-
-  if (trimmedInput === '') {
-    return true;
-  }
-
-  const hashtags = trimmedInput.split(/\s+/);
-
-  return isValidCount(hashtags) && hasDuplicate(hashtags) && isValidFormat(hashtags);
-};
-
-pristine.addValidator(hashtagInput, validateHashtag, 'Хештеги не валидны');
-
 const toggleSubmitButton = (state) => {
   buttonSubmit.disabled = state;
 
@@ -264,7 +219,6 @@ const toggleSubmitButton = (state) => {
 
 const onUserFormSubmit = (evt) => {
   evt.preventDefault();
-  const isValid = pristine.validate();
 
   if (isValid) {
     toggleSubmitButton(true);
