@@ -1,6 +1,7 @@
 import { isEscapeKey } from './utils.js';
-import { showDialog } from './dialogs.js';
+import { showDataError, showDialog } from './dialogs.js';
 import { sendData } from './server.js';
+import { uploadFile } from './form-file-upload.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -9,6 +10,9 @@ const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
 const DEFAULT_SCALE_VALUE = 100;
+const FILE_TYPES = ['.jpg', '.jpeg', '.png', '.webp'];
+const ERROR_FILE_UPLOAD_TEXT = 'Можно загружать только изображения';
+
 
 const SubmitButtonText = {
   IDLE: 'Опубликовать',
@@ -69,6 +73,7 @@ const errorTemlate = document.querySelector('#error');
 const errorDialog = errorTemlate.content.querySelector('[data-overlay]');
 const successTemplate = document.querySelector('#success');
 const successDialog = successTemplate.content.querySelector('[data-overlay]');
+
 
 let activeFilter = null;
 
@@ -196,6 +201,19 @@ uploadInput.addEventListener('change', () => {
   document.addEventListener('keydown', onFormModalKeydown);
   scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
   scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
+
+  const file = uploadInput.files[0];
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  if (matches) {
+    uploadFile(file);
+  } else {
+    showDataError();
+    const errorTitle = document.querySelector('.data-error__title');
+    errorTitle.textContent = ERROR_FILE_UPLOAD_TEXT;
+    closeForm();
+  }
 });
 
 const pristine = new Pristine(form, {
