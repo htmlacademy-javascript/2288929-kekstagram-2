@@ -1,5 +1,5 @@
 import { isEscapeKey } from './utils.js';
-import { showDataError, showDialog } from './dialogs.js';
+import { showError, showDialog } from './dialogs.js';
 import { sendData } from './server.js';
 import { uploadFile } from './form-file-upload.js';
 import { isTextInputActive, isValid } from './form-validation.js';
@@ -10,6 +10,7 @@ const MAX_SCALE_VALUE = 100;
 const DEFAULT_SCALE_VALUE = 100;
 const FILE_TYPES = ['.jpg', '.jpeg', '.png', '.webp'];
 const ERROR_FILE_UPLOAD_TEXT = 'Можно загружать только изображения';
+const DEFAULT_PREVIEW_IMAGE_URL = 'img/upload-default-image.jpg';
 
 const SubmitButtonText = {
   IDLE: 'Опубликовать',
@@ -64,12 +65,12 @@ const imageUploadEffectLevel = form.querySelector('.img-upload__effect-level');
 const effectLevelValue = imageUploadEffectLevel.querySelector('.effect-level__value');
 const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
 const effectsContainer = form.querySelector('.effects__list');
+const effectsPreview = effectsContainer.querySelectorAll('.effects__preview');
 const buttonSubmit = form.querySelector('.img-upload__submit');
 const errorTemlate = document.querySelector('#error');
 const errorDialog = errorTemlate.content.querySelector('[data-overlay]');
 const successTemplate = document.querySelector('#success');
 const successDialog = successTemplate.content.querySelector('[data-overlay]');
-
 
 let activeFilter = null;
 
@@ -105,6 +106,10 @@ const resetFilter = () => {
   imageUploadPreview.style.filter = '';
   imageUploadPreview.removeAttribute('style');
   form.reset();
+  imageUploadPreview.src = DEFAULT_PREVIEW_IMAGE_URL;
+  effectsPreview.forEach((item) => {
+    item.style.backgroundImage = `url(${DEFAULT_PREVIEW_IMAGE_URL})`;
+  });
 };
 
 const updateFilter = (config) => {
@@ -163,7 +168,7 @@ const onScaleControlSmallerClick = () => scaleImageSmaller();
 const onScaleControlBiggerClick = () => scaleImageBigger();
 
 const onFormModalKeydown = (evt) => {
-  if (isEscapeKey(evt.key) && !isTextInputActive) {
+  if (isEscapeKey(evt.key) && !isTextInputActive()) {
     evt.preventDefault();
     closeForm();
   }
@@ -203,7 +208,7 @@ uploadInput.addEventListener('change', () => {
   if (matches) {
     uploadFile(file);
   } else {
-    showDataError();
+    showError();
     const errorTitle = document.querySelector('.data-error__title');
     errorTitle.textContent = ERROR_FILE_UPLOAD_TEXT;
     closeForm();

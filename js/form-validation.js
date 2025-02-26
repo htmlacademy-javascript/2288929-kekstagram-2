@@ -1,4 +1,3 @@
-
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
 const HASHTAG_FORMAT_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
@@ -38,7 +37,6 @@ const unifyHashtagArray = (input) => {
 const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
 
 const isValidCount = (hashtags) => unifyHashtagArray(hashtags).length <= MAX_HASHTAG_COUNT;
-
 
 const hasDuplicate = (hashtagArr) => {
   const hashtags = unifyHashtagArray(hashtagArr);
