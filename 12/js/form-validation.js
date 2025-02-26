@@ -31,7 +31,7 @@ const unifyHashtagArray = (input) => {
     return [];
   }
 
-  return trimmedInput.split(/\s+/);
+  return trimmedInput.toLowerCase().split(/\s+/);
 };
 
 const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
