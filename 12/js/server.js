@@ -1,5 +1,3 @@
-import { showError} from './dialogs.js';
-
 const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
 
 const Route = {
@@ -11,7 +9,7 @@ export const getData = () =>
   fetch(`${BASE_URL}${Route.GET_DATA}`)
     .then((response) => {
       if (!response.ok) {
-        showError();
+        throw new Error();
       }
 
       return response.json();

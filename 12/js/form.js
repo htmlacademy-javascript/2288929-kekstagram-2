@@ -1,16 +1,15 @@
 import { isEscapeKey } from './utils.js';
-import { showError, showDialog } from './dialogs.js';
+import { showDialog } from './dialogs.js';
 import { sendData } from './server.js';
-import { uploadFile } from './form-file-upload.js';
-import { isTextInputActive, isValid } from './form-validation.js';
+import { uploadFile, resetUploadForm } from './form-file-upload.js';
 
 const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
 const DEFAULT_SCALE_VALUE = 100;
-const FILE_TYPES = ['.jpg', '.jpeg', '.png', '.webp'];
-const ERROR_FILE_UPLOAD_TEXT = 'Можно загружать только изображения';
-const DEFAULT_PREVIEW_IMAGE_URL = 'img/upload-default-image.jpg';
+const MAX_COMMENT_LENGTH = 140;
+const MAX_HASHTAG_COUNT = 5;
+const HASHTAG_FORMAT_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
 
 const SubmitButtonText = {
   IDLE: 'Опубликовать',
@@ -51,12 +50,17 @@ const FilterEffects = {
     step: 0.1,
   }
 };
+const ValidationErrorMessages = {
+  maxCommentLength: `Не более ${MAX_COMMENT_LENGTH} символов`,
+  maxHashtagCount: `Не более ${MAX_HASHTAG_COUNT} хештегов`,
+  hasDuplicateHashtag: 'Хештеги не должны повторяться',
+  hasWrongFormat: 'Неправильный формат. Введите "#", далее хотя бы одна буква или цифра и не более 20 символов'
+};
 
 const form = document.querySelector('.img-upload__form');
 const uploadInput = form.querySelector('.img-upload__input');
 const uploadOverlay = form.querySelector('.img-upload__overlay');
 const resetButton = form.querySelector('.img-upload__cancel');
-
 const scaleControlSmaller = form.querySelector('.scale__control--smaller');
 const scaleControlBigger = form.querySelector('.scale__control--bigger');
 const scaleControl = form.querySelector('.scale__control--value');
@@ -65,12 +69,13 @@ const imageUploadEffectLevel = form.querySelector('.img-upload__effect-level');
 const effectLevelValue = imageUploadEffectLevel.querySelector('.effect-level__value');
 const slider = imageUploadEffectLevel.querySelector('.effect-level__slider');
 const effectsContainer = form.querySelector('.effects__list');
-const effectsPreview = effectsContainer.querySelectorAll('.effects__preview');
 const buttonSubmit = form.querySelector('.img-upload__submit');
 const errorTemlate = document.querySelector('#error');
 const errorDialog = errorTemlate.content.querySelector('[data-overlay]');
 const successTemplate = document.querySelector('#success');
 const successDialog = successTemplate.content.querySelector('[data-overlay]');
+const hashtagInput = form.querySelector('.text__hashtags');
+const commentInput = form.querySelector('.text__description');
 
 let activeFilter = null;
 
@@ -83,6 +88,47 @@ noUiSlider.create(slider, {
   step: 0.1,
   connect: 'lower'
 });
+
+const pristine = new Pristine(form, {
+  classTo: 'img-upload__field-wrapper',
+  errorTextParent: 'img-upload__field-wrapper',
+  errorTextTag: 'div',
+  errorTextClass: 'img-upload__field-wrapper--error'
+});
+
+const unifyHashtagArray = (input) => {
+  const trimmedInput = input.trim();
+
+  if (!trimmedInput) {
+    return [];
+  }
+
+  return trimmedInput.toLowerCase().split(/\s+/);
+};
+
+const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
+
+const isValidCount = (hashtags) => unifyHashtagArray(hashtags).length <= MAX_HASHTAG_COUNT;
+
+const hasDuplicate = (hashtagArr) => {
+  const hashtags = unifyHashtagArray(hashtagArr);
+  return new Set(hashtags).size === hashtags.length;
+};
+
+const isValidFormat = (hashtagArr) => {
+  const hashtags = unifyHashtagArray(hashtagArr);
+
+  if (!hashtags.length) {
+    return true;
+  }
+
+  return hashtags.every((hashtag) => HASHTAG_FORMAT_REGEX.test(hashtag));
+};
+
+pristine.addValidator(commentInput, validateComment, ValidationErrorMessages.maxCommentLength);
+pristine.addValidator(hashtagInput, isValidCount, ValidationErrorMessages.maxHashtagCount);
+pristine.addValidator(hashtagInput, isValidFormat, ValidationErrorMessages.hasWrongFormat);
+pristine.addValidator(hashtagInput, hasDuplicate, ValidationErrorMessages.hasDuplicateHashtag);
 
 const applyFilter = (title, value, unit) => {
   effectLevelValue.value = value;
@@ -106,10 +152,6 @@ const resetFilter = () => {
   imageUploadPreview.style.filter = '';
   imageUploadPreview.removeAttribute('style');
   form.reset();
-  imageUploadPreview.src = DEFAULT_PREVIEW_IMAGE_URL;
-  effectsPreview.forEach((item) => {
-    item.style.backgroundImage = `url(${DEFAULT_PREVIEW_IMAGE_URL})`;
-  });
 };
 
 const updateFilter = (config) => {
@@ -168,19 +210,22 @@ const onScaleControlSmallerClick = () => scaleImageSmaller();
 const onScaleControlBiggerClick = () => scaleImageBigger();
 
 const onFormModalKeydown = (evt) => {
-  if (isEscapeKey(evt.key) && !isTextInputActive()) {
+  const isTextInputActive = document.activeElement === hashtagInput || document.activeElement === commentInput;
+
+  if (isEscapeKey(evt.key) && !isTextInputActive) {
     evt.preventDefault();
     closeForm();
   }
 };
 
-function closeForm () {
+export function closeForm () {
   uploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
   uploadInput.value = '';
   updateScaleValue(DEFAULT_SCALE_VALUE);
 
   resetFilter();
+  resetUploadForm();
 
   resetButton.removeEventListener('click', onResetButtonClick);
   document.removeEventListener('keydown', onFormModalKeydown);
@@ -201,18 +246,7 @@ uploadInput.addEventListener('change', () => {
   scaleControlSmaller.addEventListener('click', onScaleControlSmallerClick);
   scaleControlBigger.addEventListener('click', onScaleControlBiggerClick);
 
-  const file = uploadInput.files[0];
-  const fileName = file.name.toLowerCase();
-  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
-
-  if (matches) {
-    uploadFile(file);
-  } else {
-    showError();
-    const errorTitle = document.querySelector('.data-error__title');
-    errorTitle.textContent = ERROR_FILE_UPLOAD_TEXT;
-    closeForm();
-  }
+  uploadFile();
 });
 
 const toggleSubmitButton = (state) => {
@@ -224,6 +258,7 @@ const toggleSubmitButton = (state) => {
 
 const onUserFormSubmit = (evt) => {
   evt.preventDefault();
+  const isValid = pristine.validate();
 
   if (isValid) {
     toggleSubmitButton(true);
