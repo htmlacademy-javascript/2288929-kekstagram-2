@@ -23,9 +23,9 @@ const onDocumentKeydown = (evt) => {
 };
 
 const onDocumentClick = (evt) => {
-  const isClosableElem = evt.target.matches('[data-overlay]') || evt.target.closest('button[type="button"]');
+  const isClosableArea = evt.target.matches('[data-overlay]') || evt.target.closest('button[type="button"]');
 
-  if (isClosableElem) {
+  if (isClosableArea) {
     closeDialog();
   }
 };
