@@ -4,7 +4,7 @@ import { getUserPhotos, renderGallery, clearPhotos } from './gallery.js';
 const RANDOM_PHOTO_COUNT = 10;
 const ACTIVE_FILTER_BUTTON_CLASS = 'img-filters__button--active';
 
-const GallerySortingAction = {
+const GallerySortingActions = {
   'filter-random': (photos) => photos.toSorted(() => Math.random() - 0.5).slice(0, RANDOM_PHOTO_COUNT),
   'filter-discussed': (photos) => photos.toSorted((photoA, photoB) => photoB.comments.length - photoA.comments.length)
 };
@@ -22,10 +22,10 @@ const filterGallery = debounce((newFilterId) => {
   }
 
   activeFilter = newFilterId;
-  const sortionAction = GallerySortingAction[newFilterId];
+  const sortingAction = GallerySortingActions[newFilterId];
 
   const userPhotos = getUserPhotos();
-  const sortedPhotos = sortionAction ? sortionAction(userPhotos) : userPhotos;
+  const sortedPhotos = sortingAction ? sortingAction(userPhotos) : userPhotos;
 
   clearPhotos();
   renderGallery(sortedPhotos);

@@ -1,7 +1,7 @@
 import { isEscapeKey } from './utils.js';
 import { showDialog } from './dialogs.js';
 import { sendData } from './server.js';
-import { uploadFile, resetUploadForm } from './form-file-upload.js';
+import { uploadFile, resetFormPictures } from './file-upload.js';
 
 const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
@@ -99,30 +99,23 @@ const pristine = new Pristine(form, {
 const unifyHashtagArray = (input) => {
   const trimmedInput = input.trim();
 
-  if (!trimmedInput) {
-    return [];
-  }
-
-  return trimmedInput.toLowerCase().split(/\s+/);
+  return !trimmedInput ? [] : trimmedInput.toLowerCase().split(/\s+/);
 };
 
 const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
 
-const isValidCount = (hashtags) => unifyHashtagArray(hashtags).length <= MAX_HASHTAG_COUNT;
+const isValidCount = (str) => unifyHashtagArray(str).length <= MAX_HASHTAG_COUNT;
 
-const hasDuplicate = (hashtagArr) => {
-  const hashtags = unifyHashtagArray(hashtagArr);
+const hasDuplicate = (str) => {
+  const hashtags = unifyHashtagArray(str);
+
   return new Set(hashtags).size === hashtags.length;
 };
 
-const isValidFormat = (hashtagArr) => {
-  const hashtags = unifyHashtagArray(hashtagArr);
+const isValidFormat = (str) => {
+  const hashtags = unifyHashtagArray(str);
 
-  if (!hashtags.length) {
-    return true;
-  }
-
-  return hashtags.every((hashtag) => HASHTAG_FORMAT_REGEX.test(hashtag));
+  return !hashtags.length ? true : hashtags.every((hashtag) => HASHTAG_FORMAT_REGEX.test(hashtag));
 };
 
 pristine.addValidator(commentInput, validateComment, ValidationErrorMessages.maxCommentLength);
@@ -225,7 +218,7 @@ export function closeForm () {
   updateScaleValue(DEFAULT_SCALE_VALUE);
 
   resetFilter();
-  resetUploadForm();
+  resetFormPictures();
 
   resetButton.removeEventListener('click', onResetButtonClick);
   document.removeEventListener('keydown', onFormModalKeydown);

@@ -25,7 +25,4 @@ export const sendData = (body) =>
     if (!response.ok) {
       throw new Error();
     }
-  })
-    .catch(() => {
-      throw new Error;
-    });
+  });

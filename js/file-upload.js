@@ -11,6 +11,13 @@ const effectsPreview = effectsContainer.querySelectorAll('.effects__preview');
 const imageUploadPreview = form.querySelector('.img-upload__preview').querySelector('img');
 const uploadInput = form.querySelector('.img-upload__input');
 
+export const resetFormPictures = (image = DEFAULT_PREVIEW_IMAGE_URL) => {
+  imageUploadPreview.src = image;
+  effectsPreview.forEach((item) => {
+    item.style.backgroundImage = `url(${image})`;
+  });
+};
+
 export const uploadFile = () => {
   const file = uploadInput.files[0];
   const fileName = file.name.toLowerCase();
@@ -18,21 +25,9 @@ export const uploadFile = () => {
 
   if (matches) {
     const url = URL.createObjectURL(file);
-    imageUploadPreview.src = url;
-    effectsPreview.forEach((item) => {
-      item.style.backgroundImage = `url(${url})`;
-    });
+    resetFormPictures(url);
   } else {
-    showError();
-    const errorTitle = document.querySelector('.data-error__title');
-    errorTitle.textContent = ERROR_FILE_UPLOAD_TEXT;
+    showError(ERROR_FILE_UPLOAD_TEXT);
     closeForm();
   }
-};
-
-export const resetUploadForm = () => {
-  imageUploadPreview.src = DEFAULT_PREVIEW_IMAGE_URL;
-  effectsPreview.forEach((item) => {
-    item.style.backgroundImage = `url(${DEFAULT_PREVIEW_IMAGE_URL})`;
-  });
 };
