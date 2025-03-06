@@ -6,8 +6,14 @@ const templateErrorMessage = document.querySelector('#data-error').content.query
 
 let currentDialog;
 
-export const showError = () => {
+export const showError = (errorText) => {
   const template = templateErrorMessage.cloneNode(true);
+
+  if (errorText) {
+    const errorTitle = template.querySelector('.data-error__title');
+    errorTitle.textContent = errorText;
+  }
+
   document.body.append(template);
 
   setTimeout(() => {
