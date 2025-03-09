@@ -1,7 +1,7 @@
 import { isEscapeKey } from './utils.js';
 import { showDialog } from './dialogs.js';
 import { sendData } from './server.js';
-import { uploadFile, resetFormPictures } from './file-upload.js';
+import { uploadFile, setFormPictures } from './file-upload.js';
 
 const SCALE_VALUE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
@@ -54,7 +54,7 @@ const ValidationErrorMessages = {
   maxCommentLength: `Не более ${MAX_COMMENT_LENGTH} символов`,
   maxHashtagCount: `Не более ${MAX_HASHTAG_COUNT} хештегов`,
   hasDuplicateHashtag: 'Хештеги не должны повторяться',
-  hasWrongFormat: 'Неправильный формат. Введите "#", далее хотя бы одна буква или цифра и не более 20 символов'
+  hasWrongFormat: 'Неверный формат. Введите "#", далее хотя бы одна буква или цифра и не более 20 символов. Хештеги нужно отделить пробелами'
 };
 
 const form = document.querySelector('.img-upload__form');
@@ -102,26 +102,26 @@ const unifyHashtagArray = (input) => {
   return !trimmedInput ? [] : trimmedInput.toLowerCase().split(/\s+/);
 };
 
-const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
+const isCommentValid = (value) => value.length <= MAX_COMMENT_LENGTH;
 
-const isValidCount = (str) => unifyHashtagArray(str).length <= MAX_HASHTAG_COUNT;
+const isTagCountValid = (str) => unifyHashtagArray(str).length <= MAX_HASHTAG_COUNT;
 
-const hasDuplicate = (str) => {
+const isTagsUnique = (str) => {
   const hashtags = unifyHashtagArray(str);
 
   return new Set(hashtags).size === hashtags.length;
 };
 
-const isValidFormat = (str) => {
+const isTagsFormatValid = (str) => {
   const hashtags = unifyHashtagArray(str);
 
   return !hashtags.length ? true : hashtags.every((hashtag) => HASHTAG_FORMAT_REGEX.test(hashtag));
 };
 
-pristine.addValidator(commentInput, validateComment, ValidationErrorMessages.maxCommentLength);
-pristine.addValidator(hashtagInput, isValidCount, ValidationErrorMessages.maxHashtagCount);
-pristine.addValidator(hashtagInput, isValidFormat, ValidationErrorMessages.hasWrongFormat);
-pristine.addValidator(hashtagInput, hasDuplicate, ValidationErrorMessages.hasDuplicateHashtag);
+pristine.addValidator(commentInput, isCommentValid, ValidationErrorMessages.maxCommentLength);
+pristine.addValidator(hashtagInput, isTagCountValid , ValidationErrorMessages.maxHashtagCount);
+pristine.addValidator(hashtagInput, isTagsFormatValid, ValidationErrorMessages.hasWrongFormat);
+pristine.addValidator(hashtagInput, isTagsUnique, ValidationErrorMessages.hasDuplicateHashtag);
 
 const applyFilter = (title, value, unit) => {
   effectLevelValue.value = value;
@@ -218,7 +218,7 @@ export function closeForm () {
   updateScaleValue(DEFAULT_SCALE_VALUE);
 
   resetFilter();
-  resetFormPictures();
+  setFormPictures();
 
   resetButton.removeEventListener('click', onResetButtonClick);
   document.removeEventListener('keydown', onFormModalKeydown);
