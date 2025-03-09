@@ -11,7 +11,7 @@ const effectsPreview = effectsContainer.querySelectorAll('.effects__preview');
 const imageUploadPreview = form.querySelector('.img-upload__preview').querySelector('img');
 const uploadInput = form.querySelector('.img-upload__input');
 
-export const resetFormPictures = (image = DEFAULT_PREVIEW_IMAGE_URL) => {
+export const setFormPictures = (image = DEFAULT_PREVIEW_IMAGE_URL) => {
   imageUploadPreview.src = image;
   effectsPreview.forEach((item) => {
     item.style.backgroundImage = `url(${image})`;
@@ -25,7 +25,7 @@ export const uploadFile = () => {
 
   if (matches) {
     const url = URL.createObjectURL(file);
-    resetFormPictures(url);
+    setFormPictures(url);
   } else {
     showError(ERROR_FILE_UPLOAD_TEXT);
     closeForm();

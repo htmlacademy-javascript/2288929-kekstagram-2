@@ -55,4 +55,3 @@ thumbnailsContainer.addEventListener('click', (evt) => {
 
   openBigPicture(photoData);
 });
-
