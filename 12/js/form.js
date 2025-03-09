@@ -219,6 +219,7 @@ export function closeForm () {
 
   resetFilter();
   setFormPictures();
+  pristine.reset();
 
   resetButton.removeEventListener('click', onResetButtonClick);
   document.removeEventListener('keydown', onFormModalKeydown);
