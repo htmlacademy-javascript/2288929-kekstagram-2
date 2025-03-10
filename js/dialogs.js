@@ -3,10 +3,17 @@ import { isEscapeKey } from './utils.js';
 const ERROR_MESSAGE_TIMEOUT = 5000;
 
 const templateErrorMessage = document.querySelector('#data-error').content.querySelector('.data-error');
+
 let currentDialog;
 
-export const showDataError = () => {
+export const showError = (errorText) => {
   const template = templateErrorMessage.cloneNode(true);
+
+  if (errorText) {
+    const errorTitle = template.querySelector('.data-error__title');
+    errorTitle.textContent = errorText;
+  }
+
   document.body.append(template);
 
   setTimeout(() => {
@@ -22,9 +29,9 @@ const onDocumentKeydown = (evt) => {
 };
 
 const onDocumentClick = (evt) => {
-  const isOverlayOrButton = evt.target.matches('[data-overlay]') || evt.target.closest('button[type="button"]');
+  const isClosableArea = evt.target.matches('[data-overlay]') || evt.target.closest('button[type="button"]');
 
-  if (isOverlayOrButton) {
+  if (isClosableArea) {
     closeDialog();
   }
 };
