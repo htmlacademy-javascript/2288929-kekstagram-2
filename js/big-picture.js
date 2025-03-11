@@ -14,7 +14,7 @@ const commentsLoaderButton = bigPictureContainer.querySelector('.comments-loader
 const commentsContainer = bigPictureContainer.querySelector('.social__comments');
 const templateComment = document.querySelector('#user-comment').content.querySelector('.social__comment');
 
-let currentComment = [];
+let currentComments = [];
 let currentCommentCount = 0;
 
 const onDocumentKeydown = (evt) => {
@@ -40,7 +40,7 @@ const createComment = ({avatar, name, message}) => {
 
 const renderComments = () => {
   const fragment = document.createDocumentFragment();
-  const nextComments = currentComment.slice(currentCommentCount, currentCommentCount + COMMENT_PER_CLICK);
+  const nextComments = currentComments.slice(currentCommentCount, currentCommentCount + COMMENT_PER_CLICK);
   currentCommentCount += nextComments.length;
 
   nextComments.forEach((commentData) => {
@@ -52,7 +52,7 @@ const renderComments = () => {
 
   updateCommentShownCount();
 
-  if (currentCommentCount >= currentComment.length) {
+  if (currentCommentCount >= currentComments.length) {
     commentsLoaderButton.classList.add('hidden');
   }
 };
@@ -64,7 +64,7 @@ export const openBigPicture = ({url, description, likes, comments}) => {
   document.body.classList.add('modal-open');
   commentsLoaderButton.classList.remove('hidden');
 
-  currentComment = comments;
+  currentComments = comments;
 
   bigPicture.src = url;
   socialCaption.textContent = description;
